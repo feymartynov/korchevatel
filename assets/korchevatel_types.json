@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "name": "korchevatel::player::PlayerSpawnPoint",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": []
+  }
+]

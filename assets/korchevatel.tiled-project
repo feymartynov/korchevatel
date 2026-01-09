@@ -1,0 +1,26 @@
+{
+    "automappingRulesFile": "",
+    "commands": [
+    ],
+    "compatibilityVersion": 1100,
+    "extensionsPath": "extensions",
+    "folders": [
+        "."
+    ],
+    "properties": [
+    ],
+    "propertyTypes": [
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 1,
+            "members": [
+            ],
+            "name": "korchevatel::player::PlayerSpawnPoint",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        }
+    ]
+}

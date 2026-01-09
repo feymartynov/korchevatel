@@ -1,0 +1,19 @@
+[package]
+name = "korchevatel"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+avian2d = { version = "0.4.1", features = ["debug-plugin", "bevy_diagnostic", "diagnostic_ui"] }
+bevy = { version = "0.17.3", features = ["debug"] }
+bevy_ecs_tiled = { version = "0.10.0", features = ["avian", "physics", "user_properties"] }
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[target.x86_64-pc-windows-gnu]
+linker = "x86_64-w64-mingw32-gcc"
+ar = "x86_64-w64-mingw32-ar"
