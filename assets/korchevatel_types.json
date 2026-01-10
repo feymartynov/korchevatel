@@ -1,6 +1,6 @@
 [
   {
-    "id": 3,
+    "id": 5,
     "name": "bevy_math::rects::rect::Rect",
     "type": "class",
     "useAs": [
@@ -30,7 +30,7 @@
     ]
   },
   {
-    "id": 4,
+    "id": 6,
     "name": "glam::Vec2",
     "type": "class",
     "useAs": [
@@ -71,6 +71,34 @@
   },
   {
     "id": 2,
+    "name": "korchevatel::character::Character",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": []
+  },
+  {
+    "id": 3,
+    "name": "korchevatel::level::Layer",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": [
+      {
+        "name": "mask",
+        "type": "int",
+        "value": null
+      }
+    ]
+  },
+  {
+    "id": 4,
     "name": "korchevatel::player::PlayerSpawnPoint",
     "type": "class",
     "useAs": [

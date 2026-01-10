@@ -1,53 +1,72 @@
-use avian2d::prelude::*;
 use bevy::prelude::*;
 
 use crate::camera::FocusPoint;
-
-const SPRITE_PATH_STANDING: &str = "images/alienGreen_stand.png";
+use crate::character::Character;
+use crate::level::Layer;
+use crate::movement::MovementInput;
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<PlayerSpawnPoint>();
-    app.add_observer(spawn);
+    app.add_systems(Update, (spawn, control));
 }
 
+/// Игровой персонаж
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default)]
-#[require(Transform, Visibility, Collider)]
+#[require(Transform, Visibility, Character)]
 pub struct Player;
 
+/// Точка, где появляется игрок
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
 #[require(Transform)]
 #[reflect(Component)]
 pub struct PlayerSpawnPoint;
 
+// Создание игрового персонажа
 fn spawn(
-    add_player_spawn: On<Add, PlayerSpawnPoint>,
+    player_spawn_point_q: Query<
+        (&Transform, &Layer, &ChildOf),
+        (With<PlayerSpawnPoint>, Added<Layer>),
+    >,
+    player_q: Query<Entity, With<Player>>,
+    mut camera_q: Query<Entity, With<IsDefaultUiCamera>>,
     mut commands: Commands,
-    player_query: Query<Entity, With<Player>>,
-    player_spawn_query: Query<&Transform, With<PlayerSpawnPoint>>,
-    mut camera_query: Query<Entity, With<IsDefaultUiCamera>>,
-    asset_server: Res<AssetServer>,
 ) {
-    if !player_query.is_empty() {
+    let Ok((transform, layer, child_of)) = player_spawn_point_q.single() else {
         return;
     };
 
-    let spawn_transform = player_spawn_query
-        .get(add_player_spawn.event().entity)
-        .expect("transform");
+    if !player_q.is_empty() {
+        error!("Player already spawned");
+        return;
+    }
 
     let player = commands
         .spawn((
             Name::new("Player"),
+            Character,
             Player,
-            *spawn_transform,
-            Sprite {
-                image: asset_server.load(SPRITE_PATH_STANDING),
-                ..Default::default()
-            },
+            *transform,
+            *layer,
+            child_of.clone(),
         ))
         .id();
 
-    if let Ok(camera) = camera_query.single_mut() {
+    // Наводим камеру на игрока
+    if let Ok(camera) = camera_q.single_mut() {
         commands.entity(camera).insert(FocusPoint::new(player));
     }
+}
+
+// Управление игровым персонажем
+fn control(
+    mut movement_input_q: Query<&mut MovementInput, With<Player>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+) {
+    let Ok(mut movement_input) = movement_input_q.single_mut() else {
+        return;
+    };
+
+    let left = keyboard_input.pressed(KeyCode::KeyA);
+    let right = keyboard_input.pressed(KeyCode::KeyD);
+    movement_input.direction = (right as i8 - left as i8).into();
 }

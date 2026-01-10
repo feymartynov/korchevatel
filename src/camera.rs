@@ -7,7 +7,7 @@ const DEAD_ZONE_PERCENTAGE: f32 = 0.25;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(Startup, (setup_camera, setup_camera_cache));
-    app.add_systems(Update, cache_compute_boundaries);
+    app.add_systems(FixedUpdate, cache_compute_boundaries);
 
     app.add_systems(
         PostUpdate,

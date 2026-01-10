@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="11">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="17">
  <tileset firstgid="1" source="cars.tsx"/>
- <imagelayer id="2" name="bg" locked="1">
+ <imagelayer id="2" name="Background" locked="1">
   <image source="images/street.png" width="3072" height="1024"/>
  </imagelayer>
- <objectgroup id="4" name="Objects">
+ <objectgroup id="13" name="Layer 1">
   <object id="8" name="Camera boundary" x="0" y="0" width="3072" height="1024" visible="0">
    <properties>
     <property name="CameraBoundary" type="class" propertytype="korchevatel::camera::CameraBoundary"/>
    </properties>
   </object>
-  <object id="1" name="Player spawn" x="704" y="768">
+  <object id="11" name="Floor" x="0" y="907.138" width="3072" height="116.862" visible="0"/>
+  <object id="1" name="Player spawn point" x="672" y="704">
    <properties>
-    <property name="Player spawn" type="class" propertytype="korchevatel::player::PlayerSpawnPoint"/>
+    <property name="PlayerSpawnPoint" type="class" propertytype="korchevatel::player::PlayerSpawnPoint"/>
    </properties>
    <point/>
   </object>
-  <object id="4" gid="1" x="96" y="992" width="665" height="226"/>
-  <object id="5" gid="2" x="1280" y="992" width="728" height="195"/>
-  <object id="7" gid="4" x="2080" y="992" width="717" height="314"/>
+ </objectgroup>
+ <objectgroup id="4" name="Layer 2" parallaxx="1.05">
+  <object id="14" name="Floor" x="-3757.48" y="992" width="11296" height="32" visible="0"/>
+  <object id="4" name="Car BMW" gid="1" x="-257.403" y="996.908" width="665" height="226"/>
+  <object id="5" name="Car police" gid="2" x="1280" y="992" width="728" height="195"/>
+  <object id="7" name="Car van" gid="4" x="2080" y="992" width="717" height="314"/>
  </objectgroup>
 </map>

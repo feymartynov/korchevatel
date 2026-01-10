@@ -7,6 +7,7 @@ edition = "2024"
 avian2d = { version = "0.4.1", features = ["debug-plugin", "bevy_diagnostic", "diagnostic_ui"] }
 bevy = { version = "0.17.3", features = ["debug"] }
 bevy_ecs_tiled = { version = "0.10.0", features = ["avian", "physics", "user_properties"] }
+bevy-inspector-egui = "0.35.0"
 
 [profile.dev]
 opt-level = 1

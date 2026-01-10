@@ -3,7 +3,9 @@ use bevy::prelude::*;
 use bevy_ecs_tiled::prelude::*;
 
 pub(super) fn plugin(app: &mut App) {
+    app.register_type::<Layer>();
     app.add_systems(Startup, startup);
+    app.add_systems(FixedUpdate, change_layer);
 }
 
 fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -11,7 +13,20 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .spawn((
             TiledMap(asset_server.load("level.tmx")),
             TilemapAnchor::Center,
+            TiledPhysicsSettings::<TiledPhysicsAvianBackend> {
+                objects_filter: TiledFilter::Names(vec!["floor".into()]),
+                ..default()
+            },
         ))
+        .observe(
+            |object_created: On<TiledEvent<ObjectCreated>>, mut commands: Commands| {
+                if let Some(id) = object_created.event().get_layer_id() {
+                    commands
+                        .entity(object_created.event().origin)
+                        .insert(Layer::new(id));
+                }
+            },
+        )
         .observe(
             |collider_created: On<TiledEvent<ColliderCreated>>, mut commands: Commands| {
                 commands
@@ -19,4 +34,44 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     .insert(RigidBody::Static);
             },
         );
+}
+
+/// Слой, на котором находится объект
+#[derive(Component, Default, Clone, Copy, Debug, Reflect)]
+#[reflect(Component)]
+pub struct Layer {
+    mask: u32,
+}
+
+impl Layer {
+    fn new(id: u32) -> Self {
+        debug_assert!((1..=32).contains(&id), "Layer id must be in range 1..=32");
+
+        Self {
+            // Младший бит всегда 1, иначе ни с чем не будет взаимодействовать.
+            mask: (1 << id) | 1,
+        }
+    }
+}
+
+impl PhysicsLayer for Layer {
+    fn to_bits(&self) -> u32 {
+        self.mask
+    }
+
+    fn all_bits() -> u32 {
+        u32::MAX
+    }
+}
+
+fn change_layer(
+    q: Query<(Entity, &Layer), (With<TiledObject>, Added<Layer>)>,
+    mut commands: Commands,
+) {
+    for (entity, layer) in q.iter() {
+        // Физическое взаимодействие только с объектами текущего слоя
+        commands
+            .entity(entity)
+            .insert(CollisionLayers::new([*layer], [*layer]));
+    }
 }

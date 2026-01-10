@@ -2,30 +2,29 @@ use avian2d::prelude::*;
 use bevy::diagnostic::FrameTimeDiagnosticsPlugin;
 use bevy::input::common_conditions::input_just_pressed;
 use bevy::prelude::*;
+// use bevy_inspector_egui::bevy_egui::EguiPlugin;
+// use bevy_inspector_egui::quick::{FilterQueryInspectorPlugin, WorldInspectorPlugin};
 
-/// A plugin that adds common functionality used by examples,
-/// such as physics diagnostics UI and the ability to pause and step the simulation.
 pub struct DebugPlugin;
 
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut App) {
-        // Add diagnostics.
         app.add_plugins((
             PhysicsDiagnosticsPlugin,
             PhysicsDiagnosticsUiPlugin,
             FrameTimeDiagnosticsPlugin::default(),
+            // EguiPlugin::default(),
+            // FilterQueryInspectorPlugin::<With<TypeToInspect>>::default(),
+            // WorldInspectorPlugin::new(),
         ));
 
-        // Configure the default physics diagnostics UI.
         app.insert_resource(PhysicsDiagnosticsUiSettings {
             enabled: false,
             ..default()
         });
 
-        // Spawn text instructions for keybinds.
         app.add_systems(Startup, setup_key_instructions);
 
-        // Add systems for toggling the diagnostics UI and pausing and stepping the simulation.
         app.add_systems(
             Update,
             (
@@ -37,8 +36,6 @@ impl Plugin for DebugPlugin {
     }
 
     fn finish(&self, app: &mut App) {
-        // Add the physics debug plugin automatically if the `use-debug-plugin` feature is enabled
-        // and the plugin is not already added.
         if !app.is_plugin_added::<PhysicsDebugPlugin>() {
             app.add_plugins(PhysicsDebugPlugin);
         }

@@ -27,8 +27,79 @@
             "drawFill": true,
             "id": 2,
             "members": [
+                {
+                    "name": "0",
+                    "propertyType": "bevy_math::rects::rect::Rect",
+                    "type": "class",
+                    "value": {
+                    }
+                }
             ],
             "name": "korchevatel::camera::CameraBoundary",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 3,
+            "members": [
+                {
+                    "name": "max",
+                    "propertyType": "glam::Vec2",
+                    "type": "class",
+                    "value": {
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "name": "min",
+                    "propertyType": "glam::Vec2",
+                    "type": "class",
+                    "value": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            ],
+            "name": "bevy_math::rects::rect::Rect",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 4,
+            "members": [
+                {
+                    "name": "x",
+                    "type": "float",
+                    "value": 0
+                },
+                {
+                    "name": "y",
+                    "type": "float",
+                    "value": 0
+                }
+            ],
+            "name": "glam::Vec2",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 5,
+            "members": [
+            ],
+            "name": "korchevatel::character::Character",
             "type": "class",
             "useAs": [
                 "property"
