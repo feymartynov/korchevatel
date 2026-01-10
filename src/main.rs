@@ -37,6 +37,7 @@ fn main() {
         debug::DebugPlugin,
         camera::plugin,
         level::plugin,
+        player::plugin,
     ));
 
     let mut path = env::current_dir().expect("current dir");
