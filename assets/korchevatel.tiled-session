@@ -3,16 +3,28 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "level.tmx",
     "expandedProjectPaths": [
+        "."
     ],
     "fileStates": {
+        "level.tmx": {
+            "scale": 1.2181770833333332,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 480.22574714609436,
+                "y": 319.7400487408611
+            }
+        }
     },
     "last.objectTypesPath": "/Users/fey/dev/korchevatel/assets/korchevatel_types.json",
     "map.lastUsedFormat": "tmx",
     "openFiles": [
+        "level.tmx"
     ],
     "project": "korchevatel.tiled-project",
+    "property.type": "korchevatel::player::PlayerSpawnPoint",
     "recentFiles": [
+        "level.tmx"
     ]
 }
