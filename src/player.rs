@@ -28,7 +28,7 @@ fn spawn(
         return;
     }
 
-    let (spawn_transform) = player_spawn_query
+    let spawn_transform = player_spawn_query
         .get(add_player_spawn.event().entity)
         .expect("transform");
 

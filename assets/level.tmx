@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="4">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="8">
+ <tileset firstgid="1" source="cars.tsx"/>
  <imagelayer id="2" name="bg" locked="1">
   <image source="images/street.png" width="3072" height="1024"/>
  </imagelayer>
@@ -10,17 +11,9 @@
    </properties>
    <point/>
   </object>
+  <object id="4" gid="1" x="96" y="992" width="665" height="226"/>
+  <object id="5" gid="2" x="1280" y="992" width="728" height="195"/>
+  <object id="6" gid="3" x="1984" y="992" width="698" height="226"/>
+  <object id="7" gid="4" x="2656" y="960" width="717" height="314"/>
  </objectgroup>
- <imagelayer id="12" name="car_van" offsetx="2336" offsety="672">
-  <image source="images/car_van.png" width="717" height="314"/>
- </imagelayer>
- <imagelayer id="11" name="car_sedan" offsetx="1664" offsety="768">
-  <image source="images/car_sedan.png" width="698" height="226"/>
- </imagelayer>
- <imagelayer id="9" name="car_police" offsetx="960" offsety="800">
-  <image source="images/car_police.png" width="728" height="195"/>
- </imagelayer>
- <imagelayer id="6" name="car_bmw" offsetx="32" offsety="768">
-  <image source="images/car_bmw.png" width="665" height="226"/>
- </imagelayer>
 </map>
