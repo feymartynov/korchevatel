@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="8">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="11">
  <tileset firstgid="1" source="cars.tsx"/>
  <imagelayer id="2" name="bg" locked="1">
   <image source="images/street.png" width="3072" height="1024"/>
  </imagelayer>
  <objectgroup id="4" name="Objects">
+  <object id="8" name="Camera boundary" x="0" y="0" width="3072" height="1024" visible="0">
+   <properties>
+    <property name="CameraBoundary" type="class" propertytype="korchevatel::camera::CameraBoundary"/>
+   </properties>
+  </object>
   <object id="1" name="Player spawn" x="704" y="768">
    <properties>
     <property name="Player spawn" type="class" propertytype="korchevatel::player::PlayerSpawnPoint"/>
@@ -13,7 +18,6 @@
   </object>
   <object id="4" gid="1" x="96" y="992" width="665" height="226"/>
   <object id="5" gid="2" x="1280" y="992" width="728" height="195"/>
-  <object id="6" gid="3" x="1984" y="992" width="698" height="226"/>
-  <object id="7" gid="4" x="2656" y="960" width="717" height="314"/>
+  <object id="7" gid="4" x="2080" y="992" width="717" height="314"/>
  </objectgroup>
 </map>

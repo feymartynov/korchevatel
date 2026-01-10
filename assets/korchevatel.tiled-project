@@ -21,6 +21,18 @@
             "useAs": [
                 "property"
             ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 2,
+            "members": [
+            ],
+            "name": "korchevatel::camera::CameraBoundary",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
         }
     ]
 }

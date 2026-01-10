@@ -55,7 +55,7 @@ fn main() {
         PhysicsPlugins::default().with_length_unit(100.0),
     ));
 
-    app.insert_resource(ClearColor(Color::srgb_u8(196, 237, 240)));
+    app.insert_resource(ClearColor(Color::srgb_u8(64, 64, 64)));
     app.insert_resource(Gravity(Vec2::NEG_Y * 1000.0));
     app.run();
 }
