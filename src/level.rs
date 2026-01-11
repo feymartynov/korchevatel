@@ -5,7 +5,6 @@ use bevy_ecs_tiled::prelude::*;
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Layer>();
     app.add_systems(Startup, startup);
-    app.add_systems(FixedUpdate, change_layer);
 }
 
 fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -13,11 +12,18 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .spawn((
             TiledMap(asset_server.load("level.tmx")),
             TilemapAnchor::Center,
-            TiledPhysicsSettings::<TiledPhysicsAvianBackend> {
-                objects_filter: TiledFilter::Names(vec!["floor".into()]),
-                ..default()
-            },
         ))
+        .observe(
+            |layer_created: On<TiledEvent<LayerCreated>>, mut commands: Commands| {
+                if let Some(id) = layer_created.get_layer_id()
+                    && id > 0
+                {
+                    commands
+                        .entity(layer_created.event().origin)
+                        .insert(Layer::new(id));
+                }
+            },
+        )
         .observe(
             |object_created: On<TiledEvent<ObjectCreated>>, mut commands: Commands| {
                 if let Some(id) = object_created.event().get_layer_id() {
@@ -28,10 +34,21 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
             },
         )
         .observe(
-            |collider_created: On<TiledEvent<ColliderCreated>>, mut commands: Commands| {
+            |collider_created: On<TiledEvent<ColliderCreated>>,
+             mut collision_layers_q: Query<&mut CollisionLayers>,
+             mut commands: Commands| {
                 commands
                     .entity(collider_created.event().origin)
                     .insert(RigidBody::Static);
+
+                if let Some(layer_id) = collider_created.event().get_layer_id()
+                    && let Ok(mut collision_layers) =
+                        collision_layers_q.get_mut(collider_created.event().origin)
+                {
+                    let layer_mask = Layer::new(layer_id).into();
+                    collision_layers.memberships = layer_mask;
+                    collision_layers.filters = layer_mask;
+                }
             },
         );
 }
@@ -44,13 +61,13 @@ pub struct Layer {
 }
 
 impl Layer {
-    fn new(id: u32) -> Self {
+    pub fn new(id: u32) -> Self {
         debug_assert!((1..=32).contains(&id), "Layer id must be in range 1..=32");
+        Self { mask: (1 << id) }
+    }
 
-        Self {
-            // Младший бит всегда 1, иначе ни с чем не будет взаимодействовать.
-            mask: (1 << id) | 1,
-        }
+    pub fn id(self) -> u32 {
+        self.mask >> 1
     }
 }
 
@@ -61,17 +78,5 @@ impl PhysicsLayer for Layer {
 
     fn all_bits() -> u32 {
         u32::MAX
-    }
-}
-
-fn change_layer(
-    q: Query<(Entity, &Layer), (With<TiledObject>, Added<Layer>)>,
-    mut commands: Commands,
-) {
-    for (entity, layer) in q.iter() {
-        // Физическое взаимодействие только с объектами текущего слоя
-        commands
-            .entity(entity)
-            .insert(CollisionLayers::new([*layer], [*layer]));
     }
 }

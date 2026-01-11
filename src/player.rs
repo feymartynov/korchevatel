@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::camera::FocusPoint;
 use crate::character::Character;
 use crate::level::Layer;
-use crate::movement::MovementInput;
+use crate::movement::{MovementInput, MovementMessage};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<PlayerSpawnPoint>();
@@ -59,14 +59,24 @@ fn spawn(
 
 // Управление игровым персонажем
 fn control(
-    mut movement_input_q: Query<&mut MovementInput, With<Player>>,
+    mut movement_event_writer: MessageWriter<MovementMessage>,
+    mut movement_input_q: Query<(Entity, &mut MovementInput), With<Player>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
-    let Ok(mut movement_input) = movement_input_q.single_mut() else {
+    let Ok((player, mut movement_input)) = movement_input_q.single_mut() else {
         return;
     };
 
     let left = keyboard_input.pressed(KeyCode::KeyA);
     let right = keyboard_input.pressed(KeyCode::KeyD);
-    movement_input.direction = (right as i8 - left as i8).into();
+    movement_input.x_direction = (right as i8 - left as i8).into();
+
+    let backward = keyboard_input.just_pressed(KeyCode::KeyW);
+    let forward = keyboard_input.just_pressed(KeyCode::KeyS);
+    let z_direction = (forward as i8 - backward as i8).into();
+
+    if z_direction != 0 {
+        // Тут шлём через события, т.к. just_pressed не синхронизирован с FixedUpdate
+        movement_event_writer.write(MovementMessage::Z { entity: player, z_direction });
+    }
 }

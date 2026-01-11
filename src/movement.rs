@@ -1,9 +1,20 @@
 use avian2d::math::*;
 use avian2d::prelude::*;
 use bevy::prelude::*;
+use bevy_ecs_tiled::prelude::TiledMapStorage;
+
+use crate::level::Layer;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_systems(FixedUpdate, (update_grounded, do_move));
+    app.add_message::<MovementMessage>();
+    app.add_systems(
+        FixedUpdate,
+        (
+            update_grounded,
+            on_movement_messages.before(do_move),
+            do_move,
+        ),
+    );
 }
 
 /// Направление движения
@@ -28,6 +39,11 @@ pub struct MovementBundle {
     max_slope_angle: MaxSlopeAngle,
 }
 
+#[derive(Message)]
+pub enum MovementMessage {
+    Z { entity: Entity, z_direction: i8 },
+}
+
 impl Default for MovementBundle {
     fn default() -> Self {
         Self {
@@ -42,7 +58,8 @@ impl Default for MovementBundle {
 /// Текущее действие движения
 #[derive(Component, Default)]
 pub struct MovementInput {
-    pub direction: Scalar,
+    pub x_direction: Scalar,
+    pub z_direction: i8,
 }
 
 /// Параметры скорости
@@ -88,33 +105,75 @@ fn update_grounded(
     }
 }
 
+fn on_movement_messages(
+    mut message_reader: MessageReader<MovementMessage>,
+    mut input_q: Query<&mut MovementInput>,
+) {
+    for message in message_reader.read() {
+        match message {
+            MovementMessage::Z {
+                entity,
+                z_direction,
+            } => {
+                if let Ok(mut input) = input_q.get_mut(*entity) {
+                    input.z_direction = *z_direction;
+                }
+            }
+        }
+    }
+}
+
 /// Перемещение по команде
 fn do_move(
-    mut controllers: Query<
+    mut q: Query<
         (
-            &MovementInput,
+            &mut MovementInput,
             &mut Direction,
             &MovementSpeed,
             &mut LinearVelocity,
+            &mut Layer,
         ),
-        With<Grounded>,
+        // With<Grounded>,
     >,
+    map_storage_q: Query<&TiledMapStorage>,
 ) {
-    let Ok((input, mut direction, speed, mut linear_velocity)) = controllers.single_mut() else {
+    let Ok((mut input, mut direction, speed, mut linear_velocity, mut layer)) = q.single_mut()
+    else {
         return;
     };
 
-    linear_velocity.x += input.direction * speed.acceleration;
-    linear_velocity.x = linear_velocity.x.clamp(-speed.max_velocity, speed.max_velocity);
+    // Движение в стороны
+    linear_velocity.x += input.x_direction * speed.acceleration;
+    linear_velocity.x = linear_velocity
+        .x
+        .clamp(-speed.max_velocity, speed.max_velocity);
 
-    let new_direction = if linear_velocity.x < 0.0 {
+    *direction = if linear_velocity.x < 0.0 {
         Direction::Left
     } else {
         Direction::Right
     };
 
-    // Пишем только, когда реально поменялось, чтобы не генерить лишние события.
-    if new_direction != *direction {
-        *direction = new_direction;
+    // Переход между слоями
+    if input.z_direction == 0 {
+        return;
     }
+
+    let current_layer_id = layer.id();
+    let new_layer_id = (current_layer_id as i32 + input.z_direction as i32) as u32;
+    input.z_direction = 0;
+
+    if new_layer_id == 0
+        || new_layer_id as usize
+            > map_storage_q
+                .single()
+                .expect("map storage")
+                .layers()
+                .count()
+                - 1
+    {
+        return;
+    }
+
+    *layer = Layer::new(new_layer_id);
 }
