@@ -54,13 +54,15 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 /// Слой, на котором находится объект
-#[derive(Component, Default, Clone, Copy, Debug, Reflect)]
+#[derive(Component, Default, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Reflect)]
 #[reflect(Component)]
 pub struct Layer {
     mask: u32,
 }
 
 impl Layer {
+    pub const BOTTOM: Layer = Layer { mask: 0b10 };
+
     pub fn new(id: u32) -> Self {
         debug_assert!((1..=32).contains(&id), "Layer id must be in range 1..=32");
         Self { mask: (1 << id) }
@@ -68,6 +70,18 @@ impl Layer {
 
     pub fn id(self) -> u32 {
         self.mask >> 1
+    }
+
+    pub fn next(self) -> Self {
+        Self {
+            mask: self.mask.rotate_left(1),
+        }
+    }
+
+    pub fn prev(self) -> Self {
+        Self {
+            mask: self.mask.rotate_right(1),
+        }
     }
 }
 

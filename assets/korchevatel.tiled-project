@@ -13,37 +13,6 @@
         {
             "color": "#ff000000",
             "drawFill": true,
-            "id": 1,
-            "members": [
-            ],
-            "name": "korchevatel::player::PlayerSpawnPoint",
-            "type": "class",
-            "useAs": [
-                "property"
-            ]
-        },
-        {
-            "color": "#ff000000",
-            "drawFill": true,
-            "id": 2,
-            "members": [
-                {
-                    "name": "0",
-                    "propertyType": "bevy_math::rects::rect::Rect",
-                    "type": "class",
-                    "value": {
-                    }
-                }
-            ],
-            "name": "korchevatel::camera::CameraBoundary",
-            "type": "class",
-            "useAs": [
-                "property"
-            ]
-        },
-        {
-            "color": "#ff000000",
-            "drawFill": true,
             "id": 3,
             "members": [
                 {
@@ -96,10 +65,70 @@
         {
             "color": "#ff000000",
             "drawFill": true,
+            "id": 2,
+            "members": [
+                {
+                    "name": "0",
+                    "propertyType": "bevy_math::rects::rect::Rect",
+                    "type": "class",
+                    "value": {
+                    }
+                }
+            ],
+            "name": "korchevatel::camera::CameraBoundary",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
             "id": 5,
             "members": [
             ],
             "name": "korchevatel::character::Character",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 1,
+            "members": [
+            ],
+            "name": "korchevatel::player::PlayerSpawnPoint",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 7,
+            "members": [
+                {
+                    "name": "mask",
+                    "type": "int",
+                    "value": 0
+                }
+            ],
+            "name": "korchevatel::level::Layer",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 8,
+            "members": [
+            ],
+            "name": "korchevatel::movement::Ground",
             "type": "class",
             "useAs": [
                 "property"

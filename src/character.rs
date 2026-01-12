@@ -1,4 +1,3 @@
-use avian2d::math::*;
 use avian2d::prelude::*;
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
@@ -12,6 +11,7 @@ const SPRITE_PATH_STANDING: &str = "images/alienGreen_stand.png";
 const Z_SCALE_FACTOR: f32 = 1.25;
 
 pub(super) fn plugin(app: &mut App) {
+    app.register_type::<Character>();
     app.add_observer(on_insert);
     app.add_systems(Update, flip);
     app.add_systems(FixedUpdate, change_layer);
@@ -28,13 +28,6 @@ fn on_insert(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
-    let collider = Collider::capsule(50.0, 50.0);
-    let mut shape_caster = collider.clone();
-    shape_caster.set_scale(Vector::ONE * 0.99, 10);
-
-    let ground_caster =
-        ShapeCaster::new(shape_caster, Vector::ZERO, 0.0, Dir2::NEG_Y).with_max_distance(10.0);
-
     commands.entity(inserted.entity).insert((
         Sprite {
             image: asset_server.load(SPRITE_PATH_STANDING),
@@ -42,8 +35,7 @@ fn on_insert(
         },
         Anchor::from(Vec2::new(0.0, -0.21)),
         RigidBody::Dynamic,
-        collider,
-        ground_caster,
+        Collider::capsule(50.0, 50.0),
         LockedAxes::ROTATION_LOCKED,
         TranslationInterpolation,
         MovementBundle::default(),

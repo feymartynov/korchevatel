@@ -1,6 +1,6 @@
 [
   {
-    "id": 5,
+    "id": 18,
     "name": "bevy_math::rects::rect::Rect",
     "type": "class",
     "useAs": [
@@ -30,7 +30,59 @@
     ]
   },
   {
-    "id": 6,
+    "id": 22,
+    "name": "core::option::Option<bevy_ecs::entity::Entity>",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": [
+      {
+        "name": ":variant",
+        "propertyType": "core::option::Option<bevy_ecs::entity::Entity>:::Variant",
+        "type": "class",
+        "value": "None"
+      },
+      {
+        "name": "Some",
+        "propertyType": "core::option::Option<bevy_ecs::entity::Entity>::Some",
+        "type": "class",
+        "value": null
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "name": "core::option::Option<bevy_ecs::entity::Entity>:::Variant",
+    "type": "enum",
+    "storageType": "string",
+    "values": [
+      "None",
+      "Some"
+    ],
+    "valuesAsFlags": false
+  },
+  {
+    "id": 21,
+    "name": "core::option::Option<bevy_ecs::entity::Entity>::Some",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": [
+      {
+        "name": "0",
+        "type": "object",
+        "value": null
+      }
+    ]
+  },
+  {
+    "id": 19,
     "name": "glam::Vec2",
     "type": "class",
     "useAs": [
@@ -71,6 +123,47 @@
   },
   {
     "id": 2,
+    "name": "korchevatel::camera::CameraCache",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": [
+      {
+        "name": "half_view",
+        "propertyType": "glam::Vec2",
+        "type": "class",
+        "value": null
+      },
+      {
+        "name": "dead_zone",
+        "propertyType": "glam::Vec2",
+        "type": "class",
+        "value": null
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "korchevatel::camera::FocusPoint",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": [
+      {
+        "name": "0",
+        "type": "object",
+        "value": null
+      }
+    ]
+  },
+  {
+    "id": 4,
     "name": "korchevatel::character::Character",
     "type": "class",
     "useAs": [
@@ -81,7 +174,7 @@
     "members": []
   },
   {
-    "id": 3,
+    "id": 5,
     "name": "korchevatel::level::Layer",
     "type": "class",
     "useAs": [
@@ -98,7 +191,199 @@
     ]
   },
   {
-    "id": 4,
+    "id": 7,
+    "name": "korchevatel::movement::Direction",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": [
+      {
+        "name": ":variant",
+        "propertyType": "korchevatel::movement::Direction:::Variant",
+        "type": "class",
+        "value": "Left"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "korchevatel::movement::Direction:::Variant",
+    "type": "enum",
+    "storageType": "string",
+    "values": [
+      "Left",
+      "Right"
+    ],
+    "valuesAsFlags": false
+  },
+  {
+    "id": 8,
+    "name": "korchevatel::movement::Ground",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": []
+  },
+  {
+    "id": 9,
+    "name": "korchevatel::movement::Grounded",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": []
+  },
+  {
+    "id": 10,
+    "name": "korchevatel::movement::MaxSlopeAngle",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": [
+      {
+        "name": "0",
+        "type": "float",
+        "value": null
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "name": "korchevatel::movement::MovementInput",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": [
+      {
+        "name": "x_direction",
+        "type": "float",
+        "value": null
+      },
+      {
+        "name": "z_direction",
+        "type": "int",
+        "value": null
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "name": "korchevatel::movement::MovementSpeed",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": [
+      {
+        "name": "acceleration",
+        "type": "float",
+        "value": null
+      },
+      {
+        "name": "max_velocity",
+        "type": "float",
+        "value": null
+      },
+      {
+        "name": "z_speed",
+        "type": "float",
+        "value": null
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "name": "korchevatel::movement::ZMode",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": [
+      {
+        "name": ":variant",
+        "propertyType": "korchevatel::movement::ZMode:::Variant",
+        "type": "class",
+        "value": "Idle"
+      },
+      {
+        "name": "Moving",
+        "propertyType": "korchevatel::movement::ZMode::Moving",
+        "type": "class",
+        "value": null
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "name": "korchevatel::movement::ZMode:::Variant",
+    "type": "enum",
+    "storageType": "string",
+    "values": [
+      "Idle",
+      "Moving"
+    ],
+    "valuesAsFlags": false
+  },
+  {
+    "id": 14,
+    "name": "korchevatel::movement::ZMode::Moving",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": [
+      {
+        "name": "from",
+        "propertyType": "korchevatel::level::Layer",
+        "type": "class",
+        "value": null
+      },
+      {
+        "name": "to",
+        "propertyType": "korchevatel::level::Layer",
+        "type": "class",
+        "value": null
+      },
+      {
+        "name": "target_y",
+        "type": "float",
+        "value": null
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "name": "korchevatel::player::Player",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": []
+  },
+  {
+    "id": 17,
     "name": "korchevatel::player::PlayerSpawnPoint",
     "type": "class",
     "useAs": [

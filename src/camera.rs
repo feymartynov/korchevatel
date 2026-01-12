@@ -6,6 +6,9 @@ use bevy_ecs_tiled::prelude::*;
 const DEAD_ZONE_PERCENTAGE: f32 = 0.25;
 
 pub(super) fn plugin(app: &mut App) {
+    app.register_type::<CameraBoundary>();
+    app.register_type::<FocusPoint>();
+    app.register_type::<CameraCache>();
     app.add_systems(Startup, (setup_camera, setup_camera_cache));
     app.add_systems(FixedUpdate, cache_compute_boundaries);
 
@@ -24,7 +27,8 @@ pub(super) fn plugin(app: &mut App) {
 #[reflect(Component)]
 pub struct CameraBoundary(Rect);
 
-#[derive(Component, Default)]
+#[derive(Component, Default, Reflect)]
+#[reflect(Component)]
 #[require(Camera2d)]
 pub struct FocusPoint(Option<Entity>);
 
@@ -34,7 +38,8 @@ impl FocusPoint {
     }
 }
 
-#[derive(Component, Default)]
+#[derive(Component, Default, Reflect)]
+#[reflect(Component)]
 #[require(Camera2d)]
 struct CameraCache {
     half_view: Vec2,

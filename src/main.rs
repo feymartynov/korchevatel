@@ -3,8 +3,8 @@ mod character;
 #[cfg(debug_assertions)]
 mod debug;
 mod level;
-mod player;
 mod movement;
+mod player;
 
 use std::env;
 

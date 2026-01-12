@@ -6,13 +6,15 @@ use crate::level::Layer;
 use crate::movement::{MovementInput, MovementMessage};
 
 pub(super) fn plugin(app: &mut App) {
+    app.register_type::<Player>();
     app.register_type::<PlayerSpawnPoint>();
     app.add_systems(Update, (spawn, control));
 }
 
 /// Игровой персонаж
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
 #[require(Transform, Visibility, Character)]
+#[reflect(Component)]
 pub struct Player;
 
 /// Точка, где появляется игрок
@@ -77,6 +79,9 @@ fn control(
 
     if z_direction != 0 {
         // Тут шлём через события, т.к. just_pressed не синхронизирован с FixedUpdate
-        movement_event_writer.write(MovementMessage::Z { entity: player, z_direction });
+        movement_event_writer.write(MovementMessage::Z {
+            entity: player,
+            z_direction,
+        });
     }
 }
