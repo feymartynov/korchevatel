@@ -9,6 +9,9 @@ use bevy_ecs_tiled::prelude::TiledMapStorage;
 
 use crate::level::Layer;
 
+/// Во сколько раз масштабируется объект при переходе на следующий слой
+const Z_SCALE_FACTOR: f32 = 1.1;
+
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Ground>();
     app.register_type::<Grounded>();
@@ -16,21 +19,24 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<MovementInput>();
     app.register_type::<MovementSpeed>();
     app.register_type::<MaxSlopeAngle>();
-    app.register_type::<ZMode>();
+    app.register_type::<ZMoving>();
     app.add_message::<MovementMessage>();
 
     app.add_systems(
         FixedUpdate,
         (
-            update_grounded,
+            update_grounded.before(do_move),
             on_movement_messages.before(do_move),
             do_move,
+            on_layer_changed.after(do_move),
         ),
     );
 }
 
+/// Команды перемещения, которые могут быть назначены не в текущем кадре
 #[derive(Message)]
 pub enum MovementMessage {
+    /// Перемещение объекта на 1 слой вглубь (-1) или наружу (+1)
     Z { entity: Entity, z_direction: i8 },
 }
 
@@ -61,8 +67,8 @@ pub struct MovementBundle {
     direction: Direction,
     speed: MovementSpeed,
     max_slope_angle: MaxSlopeAngle,
-    z_mode: ZMode,
     gravity_scale: GravityScale,
+    transform_interpolation: TransformInterpolation,
 }
 
 impl MovementBundle {
@@ -72,8 +78,8 @@ impl MovementBundle {
             direction: Direction::default(),
             speed: MovementSpeed::default(),
             max_slope_angle: MaxSlopeAngle(PI * 0.45),
-            z_mode: ZMode::default(),
             gravity_scale: GravityScale::default(),
+            transform_interpolation: TransformInterpolation,
         }
     }
 }
@@ -111,19 +117,15 @@ impl Default for MovementSpeed {
 #[reflect(Component)]
 struct MaxSlopeAngle(Scalar);
 
-/// Режим перехода между слоями
-#[derive(Component, Default, Reflect)]
+/// Переход, между слоями
+/// Этот компонент добавляется только на время перехода
+#[derive(Component, Reflect)]
 #[reflect(Component)]
-pub enum ZMode {
-    /// Находится на своём слое
-    #[default]
-    Idle,
-    /// Двигается на камеру или от камеры
-    Moving {
-        from: Layer,
-        to: Layer,
-        target_y: Scalar,
-    },
+pub struct ZMoving {
+    from_layer: Layer,
+    to_layer: Layer,
+    to_y: Scalar,
+    scale_velocity: Scalar,
 }
 
 /// Определение приземления
@@ -194,8 +196,9 @@ fn do_move(
         &MovementSpeed,
         &mut LinearVelocity,
         &mut Layer,
-        &mut ZMode,
+        Option<&ZMoving>,
         &mut GravityScale,
+        &mut Transform,
         &GlobalTransform,
         &Collider,
     )>,
@@ -203,9 +206,10 @@ fn do_move(
     spatial_q: SpatialQuery,
     ground_collider_q: Query<&TiledColliderOf>,
     ground_q: Query<(), With<Ground>>,
+    physics_time: Res<Time<Physics>>,
     mut commands: Commands,
 ) {
-    let Ok((
+    for (
         entity,
         mut input,
         mut direction,
@@ -213,113 +217,152 @@ fn do_move(
         speed,
         mut linear_velocity,
         mut layer,
-        mut z_mode,
+        z_moving,
         mut gravity_scale,
+        mut transform,
         global_transform,
         collider,
-    )) = q.single_mut()
-    else {
-        return;
-    };
-
-    match *z_mode {
-        ZMode::Idle => {
-            // Движение в стороны возможно только, когда не перемещаемся между слоями
-            if is_grounded {
-                linear_velocity.x += input.x_direction * speed.acceleration;
-
-                linear_velocity.x = linear_velocity
-                    .x
-                    .clamp(-speed.max_velocity, speed.max_velocity);
-
-                *direction = if linear_velocity.x < 0.0 {
-                    Direction::Left
-                } else {
-                    Direction::Right
-                };
-            }
-        }
-        ZMode::Moving { from, to, target_y } => {
+    ) in q.iter_mut()
+    {
+        if let Some(&ZMoving {
+            from_layer,
+            to_layer,
+            to_y,
+            scale_velocity,
+            ..
+        }) = z_moving.as_ref()
+        {
             // Завершение перемещения между слоями
             let current_y = global_transform.translation().y;
 
-            if to < from && current_y >= target_y || to > from && current_y <= target_y {
+            if to_layer < from_layer && current_y >= *to_y
+                || to_layer > from_layer && current_y <= *to_y
+            {
+                *layer = *to_layer;
                 linear_velocity.y = 0.0;
-                *layer = to;
-                commands.entity(entity).remove::<ColliderDisabled>();
+                commands.entity(entity).remove::<(ZMoving, ColliderDisabled)>();
                 *gravity_scale = GravityScale::default();
-                *z_mode = ZMode::Idle;
+                continue;
+            }
+
+            // Анимация масштабирования для симуляции перспективы
+            transform.scale += scale_velocity * physics_time.delta_secs();
+        } else if is_grounded {
+            // Движение в стороны возможно только, когда не перемещаемся между слоями и не падаем.
+            // Однако, на время перемещения скорость по X сохраняется.
+            linear_velocity.x += input.x_direction * speed.acceleration;
+
+            linear_velocity.x = linear_velocity
+                .x
+                .clamp(-speed.max_velocity, speed.max_velocity);
+
+            if linear_velocity.x < -f32::EPSILON {
+                *direction = Direction::Left;
+            } else if linear_velocity.x > f32::EPSILON {
+                *direction = Direction::Right;
             }
         }
+
+        // Забираем команду смены слоя
+        let z_direction = std::mem::take(&mut input.z_direction);
+
+        // Нельзя менять слои в падении
+        if !is_grounded {
+            continue;
+        }
+
+        // Начало перехода между слоями, если была команда
+        let new_layer = match z_direction.cmp(&0) {
+            Ordering::Equal => return,
+            Ordering::Greater => layer.next(),
+            Ordering::Less => layer.prev(),
+        };
+
+        let top_layer = Layer::new(
+            map_storage_q
+                .single()
+                .expect("map storage")
+                .layers()
+                .count() as u32
+                - 1,
+        );
+
+        if !(Layer::BOTTOM..=top_layer).contains(&new_layer) {
+            continue;
+        }
+
+        // Симуляция движения по Z – это на самом деле это движение по Y.
+        // Чтобы узнать уровень пола и нет ли препятствий, узнаём, во что на целевом слое врежется
+        // объект при перемещении по Y.
+        let Some(shape_hit) = spatial_q.cast_shape(
+            &collider,
+            global_transform.translation().truncate(),
+            0.0,
+            Dir2::from_xy(linear_velocity.x, speed.z_speed * -z_direction as f32)
+                .expect("direction"),
+            // Слои не должны быть далеко. Ограничиваем зону поиска для предотвращения глюков
+            &ShapeCastConfig::from_max_distance(300.0),
+            &SpatialQueryFilter {
+                mask: new_layer.into(),
+                ..Default::default()
+            },
+        ) else {
+            continue;
+        };
+
+        // Если врежемся не в землю, значит это препятствие и смена слоя запрещена
+        //
+        // У объектов карты коллайдер вешается не на сам объект, а на дочку с TiledColliderOf,
+        // поэтому надо сначала сходить по ссылке.
+        if ground_collider_q
+            .get(shape_hit.entity)
+            .and_then(|tiled_collider_of| ground_q.get(tiled_collider_of.0))
+            .is_err()
+        {
+            continue;
+        }
+
+        // Верхушка пола, куда собираемся приехать
+        let to_y =
+            shape_hit.point1.y * shape_hit.normal1.y + shape_hit.point2.y * shape_hit.normal2.y;
+
+        // Зная, за сколько приедем, рассчитываем скорость масштабирования
+        let from_y = global_transform.translation().y;
+        let z_moving_time = (from_y - to_y) / speed.z_speed;
+        let scale_velocity = (Z_SCALE_FACTOR - 1.0) / z_moving_time;
+
+        // Помечаем объект как перемещающийся по Z
+        commands.entity(entity).insert(ZMoving {
+            from_layer: *layer,
+            to_layer: new_layer,
+            to_y,
+            scale_velocity,
+        });
+
+        // Временно отключаем проверки на столкновения и гравитацию
+        commands.entity(entity).insert(ColliderDisabled);
+        gravity_scale.0 = 0.0;
+
+        // Запускаем движение по Y
+        linear_velocity.y -= speed.z_speed * z_direction as f32;
     }
+}
 
-    // Начало перехода между слоями, если была команда
-    let z_direction = std::mem::take(&mut input.z_direction);
+fn on_layer_changed(
+    mut q: Query<
+        (&Layer, &mut Transform, &mut CollisionLayers),
+        (With<MovementInput>, Changed<Layer>),
+    >,
+) {
+    for (layer, mut transform, mut collision_layers) in q.iter_mut() {
+        // Z-ordering для рендера слоёв
+        let z = layer.id() as f32;
+        transform.translation.z = z;
+        transform.scale = Vec3::ONE + Vec3::ONE * (Z_SCALE_FACTOR - 1.0) * (z - 1.0);
 
-    if !is_grounded {
-        return;
+        // Меняем слои взаимодействия физики
+        let layer_mask = (*layer).into();
+        collision_layers.memberships = layer_mask;
+        collision_layers.filters = layer_mask;
     }
-
-    let new_layer = match z_direction.cmp(&0) {
-        Ordering::Equal => return,
-        Ordering::Greater => layer.next(),
-        Ordering::Less => layer.prev(),
-    };
-
-    let top_layer = Layer::new(
-        map_storage_q
-            .single()
-            .expect("map storage")
-            .layers()
-            .count() as u32
-            - 1,
-    );
-
-    if !(Layer::BOTTOM..=top_layer).contains(&new_layer) {
-        return;
-    }
-
-    // Симуляция движения по Z – это на самом деле это движение по Y.
-    // Чтобы узнать, нет ли препятствий, и уровень пола, узнаём, во что на целевом слое врежется
-    // объект при перемещении по Y.
-    let Some(shape_hit) = spatial_q.cast_shape(
-        collider,
-        global_transform.translation().truncate(),
-        0.0,
-        Dir2::from_xy(linear_velocity.x, speed.z_speed * -z_direction as f32).expect("direction"),
-        // Слои не должны быть далеко. Ограничиваем зону поиска для предотвращения глюков
-        &ShapeCastConfig::from_max_distance(300.0),
-        &SpatialQueryFilter {
-            mask: new_layer.into(),
-            ..Default::default()
-        },
-    ) else {
-        return;
-    };
-
-    // Если врежемся не в землю, значит это препятствие и смена слоя запрещена
-    //
-    // У объектов карты коллайдер вешается не на сам объект, а на дочку с TiledColliderOf,
-    // поэтому надо сначала сходить по ссылке.
-    if ground_collider_q
-        .get(shape_hit.entity)
-        .and_then(|tiled_collider_of| ground_q.get(tiled_collider_of.0))
-        .is_err()
-    {
-        return;
-    }
-
-    let target_y =
-        shape_hit.point1.y * shape_hit.normal1.y + shape_hit.point2.y * shape_hit.normal2.y;
-
-    *z_mode = ZMode::Moving {
-        from: *layer,
-        to: new_layer,
-        target_y,
-    };
-
-    // Временно отключаем проверки на столкновения и гравитацию
-    commands.entity(entity).insert(ColliderDisabled);
-    gravity_scale.0 = 0.0;
-    linear_velocity.y -= speed.z_speed * z_direction as f32;
 }

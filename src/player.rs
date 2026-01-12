@@ -25,10 +25,7 @@ pub struct PlayerSpawnPoint;
 
 // Создание игрового персонажа
 fn spawn(
-    player_spawn_point_q: Query<
-        (&Transform, &Layer),
-        (With<PlayerSpawnPoint>, Added<Layer>),
-    >,
+    player_spawn_point_q: Query<(&Transform, &Layer), (With<PlayerSpawnPoint>, Added<Layer>)>,
     player_q: Query<Entity, With<Player>>,
     mut camera_q: Query<Entity, With<IsDefaultUiCamera>>,
     mut commands: Commands,
@@ -43,13 +40,7 @@ fn spawn(
     }
 
     let player = commands
-        .spawn((
-            Name::new("Player"),
-            Character,
-            Player,
-            *transform,
-            *layer,
-        ))
+        .spawn((Name::new("Player"), Character, Player, *transform, *layer))
         .id();
 
     // Наводим камеру на игрока

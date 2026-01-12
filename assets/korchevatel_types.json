@@ -1,6 +1,6 @@
 [
   {
-    "id": 18,
+    "id": 16,
     "name": "bevy_math::rects::rect::Rect",
     "type": "class",
     "useAs": [
@@ -30,7 +30,7 @@
     ]
   },
   {
-    "id": 22,
+    "id": 20,
     "name": "core::option::Option<bevy_ecs::entity::Entity>",
     "type": "class",
     "useAs": [
@@ -54,7 +54,7 @@
     ]
   },
   {
-    "id": 20,
+    "id": 18,
     "name": "core::option::Option<bevy_ecs::entity::Entity>:::Variant",
     "type": "enum",
     "storageType": "string",
@@ -65,7 +65,7 @@
     "valuesAsFlags": false
   },
   {
-    "id": 21,
+    "id": 19,
     "name": "core::option::Option<bevy_ecs::entity::Entity>::Some",
     "type": "class",
     "useAs": [
@@ -82,7 +82,7 @@
     ]
   },
   {
-    "id": 19,
+    "id": 17,
     "name": "glam::Vec2",
     "type": "class",
     "useAs": [
@@ -308,43 +308,8 @@
     ]
   },
   {
-    "id": 15,
-    "name": "korchevatel::movement::ZMode",
-    "type": "class",
-    "useAs": [
-      "property"
-    ],
-    "color": "#000000",
-    "drawFill": true,
-    "members": [
-      {
-        "name": ":variant",
-        "propertyType": "korchevatel::movement::ZMode:::Variant",
-        "type": "class",
-        "value": "Idle"
-      },
-      {
-        "name": "Moving",
-        "propertyType": "korchevatel::movement::ZMode::Moving",
-        "type": "class",
-        "value": null
-      }
-    ]
-  },
-  {
     "id": 13,
-    "name": "korchevatel::movement::ZMode:::Variant",
-    "type": "enum",
-    "storageType": "string",
-    "values": [
-      "Idle",
-      "Moving"
-    ],
-    "valuesAsFlags": false
-  },
-  {
-    "id": 14,
-    "name": "korchevatel::movement::ZMode::Moving",
+    "name": "korchevatel::movement::ZMoving",
     "type": "class",
     "useAs": [
       "property"
@@ -353,26 +318,31 @@
     "drawFill": true,
     "members": [
       {
-        "name": "from",
+        "name": "from_layer",
         "propertyType": "korchevatel::level::Layer",
         "type": "class",
         "value": null
       },
       {
-        "name": "to",
+        "name": "to_layer",
         "propertyType": "korchevatel::level::Layer",
         "type": "class",
         "value": null
       },
       {
-        "name": "target_y",
+        "name": "to_y",
+        "type": "float",
+        "value": null
+      },
+      {
+        "name": "scale_velocity",
         "type": "float",
         "value": null
       }
     ]
   },
   {
-    "id": 16,
+    "id": 14,
     "name": "korchevatel::player::Player",
     "type": "class",
     "useAs": [
@@ -383,7 +353,7 @@
     "members": []
   },
   {
-    "id": 17,
+    "id": 15,
     "name": "korchevatel::player::PlayerSpawnPoint",
     "type": "class",
     "useAs": [
