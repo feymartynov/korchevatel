@@ -14,13 +14,18 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
             TilemapAnchor::Center,
         ))
         .observe(
-            |layer_created: On<TiledEvent<LayerCreated>>, mut commands: Commands| {
+            |layer_created: On<TiledEvent<LayerCreated>>,
+             mut q: Query<&mut Transform>,
+             mut commands: Commands| {
                 if let Some(id) = layer_created.get_layer_id()
                     && id > 0
                 {
-                    commands
-                        .entity(layer_created.event().origin)
-                        .insert(Layer::new(id));
+                    let entity = layer_created.event().origin;
+                    commands.entity(entity).insert(Layer::new(id));
+
+                    if let Ok(mut transform) = q.get_mut(entity) {
+                        transform.translation.z = id as f32;
+                    }
                 }
             },
         )

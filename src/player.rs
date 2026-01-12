@@ -26,14 +26,14 @@ pub struct PlayerSpawnPoint;
 // Создание игрового персонажа
 fn spawn(
     player_spawn_point_q: Query<
-        (&Transform, &Layer, &ChildOf),
+        (&Transform, &Layer),
         (With<PlayerSpawnPoint>, Added<Layer>),
     >,
     player_q: Query<Entity, With<Player>>,
     mut camera_q: Query<Entity, With<IsDefaultUiCamera>>,
     mut commands: Commands,
 ) {
-    let Ok((transform, layer, child_of)) = player_spawn_point_q.single() else {
+    let Ok((transform, layer)) = player_spawn_point_q.single() else {
         return;
     };
 
@@ -49,7 +49,6 @@ fn spawn(
             Player,
             *transform,
             *layer,
-            child_of.clone(),
         ))
         .id();
 

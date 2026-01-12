@@ -1,14 +1,13 @@
 use avian2d::prelude::*;
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
-use bevy_ecs_tiled::prelude::TiledLayer;
 
 use crate::level::Layer;
 use crate::movement::Direction;
 use crate::movement::MovementBundle;
 
 const SPRITE_PATH_STANDING: &str = "images/alienGreen_stand.png";
-const Z_SCALE_FACTOR: f32 = 1.25;
+const Z_SCALE_FACTOR: f32 = 1.1;
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Character>();
@@ -52,29 +51,15 @@ fn flip(mut q: Query<(&mut Sprite, &Direction), Changed<Direction>>) {
 /// Смена слоя
 fn change_layer(
     mut character_q: Query<
-        (
-            Entity,
-            &Layer,
-            &mut Transform,
-            &mut Collider,
-            &mut CollisionLayers,
-        ),
+        (&Layer, &mut Transform, &mut Collider, &mut CollisionLayers),
         (With<Character>, Changed<Layer>),
     >,
-    layer_q: Query<(Entity, &Layer), With<TiledLayer>>,
-    mut commands: Commands,
 ) {
-    for (entity, layer, mut transform, mut collider, mut collision_layers) in character_q.iter_mut()
-    {
+    for (layer, mut transform, mut collider, mut collision_layers) in character_q.iter_mut() {
         let layer_id = layer.id();
 
-        let Some((layer_entity, _)) = layer_q.iter().find(|(_, l)| l.id() == layer_id) else {
-            warn!("Layer not found");
-            continue;
-        };
-
-        // Меняем парента
-        commands.entity(entity).set_parent_in_place(layer_entity);
+        // Меняем Z для упроядочивания рендеринга
+        transform.translation.z = layer_id as f32;
 
         // Меняем слои взаимодействия физики
         let layer_mask = (*layer).into();
