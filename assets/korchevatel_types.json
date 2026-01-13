@@ -1,6 +1,6 @@
 [
   {
-    "id": 16,
+    "id": 20,
     "name": "bevy_math::rects::rect::Rect",
     "type": "class",
     "useAs": [
@@ -30,7 +30,7 @@
     ]
   },
   {
-    "id": 20,
+    "id": 19,
     "name": "core::option::Option<bevy_ecs::entity::Entity>",
     "type": "class",
     "useAs": [
@@ -54,7 +54,7 @@
     ]
   },
   {
-    "id": 18,
+    "id": 17,
     "name": "core::option::Option<bevy_ecs::entity::Entity>:::Variant",
     "type": "enum",
     "storageType": "string",
@@ -65,7 +65,7 @@
     "valuesAsFlags": false
   },
   {
-    "id": 19,
+    "id": 18,
     "name": "core::option::Option<bevy_ecs::entity::Entity>::Some",
     "type": "class",
     "useAs": [
@@ -82,7 +82,7 @@
     ]
   },
   {
-    "id": 17,
+    "id": 16,
     "name": "glam::Vec2",
     "type": "class",
     "useAs": [
@@ -105,24 +105,6 @@
   },
   {
     "id": 1,
-    "name": "korchevatel::camera::CameraBoundary",
-    "type": "class",
-    "useAs": [
-      "property"
-    ],
-    "color": "#000000",
-    "drawFill": true,
-    "members": [
-      {
-        "name": "0",
-        "propertyType": "bevy_math::rects::rect::Rect",
-        "type": "class",
-        "value": null
-      }
-    ]
-  },
-  {
-    "id": 2,
     "name": "korchevatel::camera::CameraCache",
     "type": "class",
     "useAs": [
@@ -146,7 +128,7 @@
     ]
   },
   {
-    "id": 3,
+    "id": 2,
     "name": "korchevatel::camera::FocusPoint",
     "type": "class",
     "useAs": [
@@ -163,7 +145,7 @@
     ]
   },
   {
-    "id": 4,
+    "id": 3,
     "name": "korchevatel::character::Character",
     "type": "class",
     "useAs": [
@@ -174,7 +156,7 @@
     "members": []
   },
   {
-    "id": 5,
+    "id": 4,
     "name": "korchevatel::level::Layer",
     "type": "class",
     "useAs": [
@@ -186,6 +168,24 @@
       {
         "name": "mask",
         "type": "int",
+        "value": null
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "korchevatel::level::location::Boundary",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": [
+      {
+        "name": "0",
+        "propertyType": "bevy_math::rects::rect::Rect",
+        "type": "class",
         "value": null
       }
     ]

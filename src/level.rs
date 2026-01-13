@@ -1,9 +1,14 @@
+mod location;
+
 use avian2d::prelude::*;
 use bevy::prelude::*;
 use bevy_ecs_tiled::prelude::*;
 
+pub use self::location::Boundary as LocationBoundary;
+
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Layer>();
+    app.add_plugins(location::plugin);
     app.add_systems(Startup, startup);
 }
 
