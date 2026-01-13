@@ -57,8 +57,8 @@ fn setup_camera(mut commands: Commands) {
     ));
 }
 
-fn setup_camera_cache(mut q: Query<(&Projection, &mut CameraCache), Added<CameraCache>>) {
-    for (projection, mut cache) in &mut q {
+fn setup_camera_cache(q: Query<(&Projection, &mut CameraCache), Added<CameraCache>>) {
+    for (projection, mut cache) in q {
         if let Projection::Orthographic(orthographic_projection) = projection {
             cache.half_view = orthographic_projection.area.size() * 0.5;
             cache.dead_zone = cache.half_view * DEAD_ZONE_PERCENTAGE;
@@ -109,7 +109,7 @@ fn camera_follow_focus(
     }
 
     // Находим активную границу по фокусу
-    if let Some(boundary) = boundaries_q.iter().find(|b| b.0.contains(focus_pos)) {
+    if let Some(boundary) = boundaries_q.into_iter().find(|b| b.0.contains(focus_pos)) {
         let min = boundary.0.min + view.half_view;
         let max = boundary.0.max - view.half_view;
 

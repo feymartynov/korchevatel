@@ -38,8 +38,8 @@ fn on_insert(
 }
 
 /// Разворот персонажа при смене направления движения
-fn flip(mut q: Query<(&mut Sprite, &Direction), Changed<Direction>>) {
-    for (mut sprite, direction) in q.iter_mut() {
+fn flip(q: Query<(&mut Sprite, &Direction), Changed<Direction>>) {
+    for (mut sprite, direction) in q {
         sprite.flip_x = matches!(direction, Direction::Left);
     }
 }

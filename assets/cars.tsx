@@ -2,7 +2,7 @@
 <tileset version="1.10" tiledversion="1.11.2" name="cars" tilewidth="728" tileheight="314" tilecount="4" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="0">
-  <image source="images/car_bmw.png" width="665" height="226"/>
+  <image source="images/car_bmw.png" width="665" height="205"/>
   <objectgroup draworder="index" id="2">
    <object id="1" x="250.19" y="17.3004">
     <polygon points="0,0 262.167,6.65399 403.232,75.8555 411.217,206.274 -242.205,202.281 -239.544,89.1635 -103.802,58.5551"/>
@@ -25,11 +25,11 @@
    </object>
   </objectgroup>
  </tile>
- <tile id="3">
+ <tile id="4">
   <image source="images/car_van.png" width="717" height="314"/>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="21.2928" y="308.745">
-    <polygon points="0,0 2.6616,-143.726 155.703,-248.859 232.89,-267.49 280.798,-307.414 577.567,-306.084 650.76,-232.89 684.03,-86.5019 680.038,-1.3308"/>
+   <object id="1" x="16.8571" y="313.729">
+    <polygon points="0,0 10.3016,-142.349 70.2379,-170.444 172.317,-254.729 299.682,-313.729 417.681,-314.666 631.204,-281.888 680.839,-160.142 687.395,-2.80951"/>
    </object>
   </objectgroup>
  </tile>

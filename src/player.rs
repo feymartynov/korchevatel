@@ -65,7 +65,7 @@ fn control(
 
     let backward = keyboard_input.just_pressed(KeyCode::KeyW);
     let forward = keyboard_input.just_pressed(KeyCode::KeyS);
-    let z_direction = (forward as i8 - backward as i8).into();
+    let z_direction = forward as i8 - backward as i8;
 
     if z_direction != 0 {
         // Тут шлём через события, т.к. just_pressed не синхронизирован с FixedUpdate

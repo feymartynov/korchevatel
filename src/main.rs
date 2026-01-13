@@ -1,3 +1,5 @@
+#![allow(clippy::type_complexity)]
+
 mod camera;
 mod character;
 #[cfg(debug_assertions)]

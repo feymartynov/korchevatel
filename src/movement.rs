@@ -3,6 +3,7 @@ use std::f32;
 
 use avian2d::math::*;
 use avian2d::prelude::*;
+use bevy::ecs::entity::EntityHashSet;
 use bevy::prelude::*;
 use bevy_ecs_tiled::prelude::TiledColliderOf;
 use bevy_ecs_tiled::prelude::TiledMapStorage;
@@ -11,6 +12,9 @@ use crate::level::Layer;
 
 /// Во сколько раз масштабируется объект при переходе на следующий слой
 const Z_SCALE_FACTOR: f32 = 1.1;
+/// Максимальное кол-во проверок на столкновение при смене слоя.
+/// Много — дорого. Мало — проскочит и застрянет в текстурах.
+const MAX_Z_HITS: usize = 2;
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Ground>();
@@ -188,7 +192,7 @@ fn on_movement_messages(
 
 /// Перемещение по команде
 fn do_move(
-    mut q: Query<(
+    q: Query<(
         Entity,
         &mut MovementInput,
         &mut Direction,
@@ -209,7 +213,7 @@ fn do_move(
     physics_time: Res<Time<Physics>>,
     mut commands: Commands,
 ) {
-    for (
+    'outer: for (
         entity,
         mut input,
         mut direction,
@@ -222,7 +226,7 @@ fn do_move(
         mut transform,
         global_transform,
         collider,
-    ) in q.iter_mut()
+    ) in q
     {
         if let Some(&ZMoving {
             from_layer,
@@ -240,7 +244,11 @@ fn do_move(
             {
                 *layer = *to_layer;
                 linear_velocity.y = 0.0;
-                commands.entity(entity).remove::<(ZMoving, ColliderDisabled)>();
+
+                commands
+                    .entity(entity)
+                    .remove::<(ZMoving, ColliderDisabled)>();
+
                 *gravity_scale = GravityScale::default();
                 continue;
             }
@@ -294,33 +302,47 @@ fn do_move(
         // Симуляция движения по Z – это на самом деле это движение по Y.
         // Чтобы узнать уровень пола и нет ли препятствий, узнаём, во что на целевом слое врежется
         // объект при перемещении по Y.
-        let Some(shape_hit) = spatial_q.cast_shape(
-            &collider,
-            global_transform.translation().truncate(),
-            0.0,
-            Dir2::from_xy(linear_velocity.x, speed.z_speed * -z_direction as f32)
-                .expect("direction"),
-            // Слои не должны быть далеко. Ограничиваем зону поиска для предотвращения глюков
-            &ShapeCastConfig::from_max_distance(300.0),
-            &SpatialQueryFilter {
-                mask: new_layer.into(),
-                ..Default::default()
-            },
-        ) else {
-            continue;
+        let mut ground_shape_hit = None;
+
+        let mut filter = SpatialQueryFilter {
+            mask: new_layer.into(),
+            excluded_entities: EntityHashSet::with_capacity(MAX_Z_HITS),
         };
 
-        // Если врежемся не в землю, значит это препятствие и смена слоя запрещена
-        //
-        // У объектов карты коллайдер вешается не на сам объект, а на дочку с TiledColliderOf,
-        // поэтому надо сначала сходить по ссылке.
-        if ground_collider_q
-            .get(shape_hit.entity)
-            .and_then(|tiled_collider_of| ground_q.get(tiled_collider_of.0))
-            .is_err()
-        {
-            continue;
+        for _ in 0..MAX_Z_HITS {
+            let Some(shape_hit) = spatial_q.cast_shape(
+                collider,
+                global_transform.translation().truncate(),
+                0.0,
+                Dir2::from_xy(linear_velocity.x, speed.z_speed * -z_direction as f32)
+                    .expect("direction"),
+                // Слои не должны быть далеко. Ограничиваем зону поиска для предотвращения глюков
+                &ShapeCastConfig::from_max_distance(300.0),
+                &filter,
+            ) else {
+                break;
+            };
+
+            // Если врежемся не в землю, значит это препятствие и смена слоя запрещена
+            //
+            // У объектов карты коллайдер вешается не на сам объект, а на дочку с TiledColliderOf,
+            // поэтому надо сначала сходить по ссылке.
+            if ground_collider_q
+                .get(shape_hit.entity)
+                .and_then(|tiled_collider_of| ground_q.get(tiled_collider_of.0))
+                .is_err()
+            {
+                continue 'outer;
+            }
+
+            // Нашли пол, но на нём может что-то ещё стоять, поэтому проверяем дальше.
+            ground_shape_hit = Some(shape_hit);
+            filter.excluded_entities.insert(shape_hit.entity);
         }
+
+        let Some(shape_hit) = ground_shape_hit else {
+            continue;
+        };
 
         // Верхушка пола, куда собираемся приехать
         let to_y =
@@ -349,12 +371,9 @@ fn do_move(
 }
 
 fn on_layer_changed(
-    mut q: Query<
-        (&Layer, &mut Transform, &mut CollisionLayers),
-        (With<MovementInput>, Changed<Layer>),
-    >,
+    q: Query<(&Layer, &mut Transform, &mut CollisionLayers), (With<MovementInput>, Changed<Layer>)>,
 ) {
-    for (layer, mut transform, mut collision_layers) in q.iter_mut() {
+    for (layer, mut transform, mut collision_layers) in q {
         // Z-ordering для рендера слоёв
         let z = layer.id() as f32;
         transform.translation.z = z;
