@@ -58,7 +58,7 @@ fn main() {
             ),
         }),
         TiledPhysicsPlugin::<TiledPhysicsAvianBackend>::default(),
-        PhysicsPlugins::default().with_length_unit(100.0),
+        PhysicsPlugins::default().with_length_unit(200.0),
     ));
 
     app.insert_resource(ClearColor(Color::srgb_u8(64, 64, 64)));

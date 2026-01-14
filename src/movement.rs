@@ -382,6 +382,7 @@ fn on_layer_changed(
         // Меняем слои взаимодействия физики
         let layer_mask = (*layer).into();
         collision_layers.memberships = layer_mask;
-        collision_layers.filters = layer_mask;
+        // | 1, чтобы сталкивался с границами локации, находясь на любом слое
+        collision_layers.filters = layer_mask | 1;
     }
 }
