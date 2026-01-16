@@ -1,3 +1,4 @@
+use avian2d::prelude::*;
 use bevy::prelude::*;
 
 use crate::camera::FocusPoint;
@@ -51,10 +52,15 @@ fn spawn(
 
 // Управление игровым персонажем
 fn control(
+    physics_time: Res<Time<Physics>>,
     mut movement_event_writer: MessageWriter<MovementMessage>,
     mut movement_input_q: Query<(Entity, &mut MovementInput), With<Player>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
+    if physics_time.is_paused() {
+        return;
+    }
+
     let Ok((player, mut movement_input)) = movement_input_q.single_mut() else {
         return;
     };

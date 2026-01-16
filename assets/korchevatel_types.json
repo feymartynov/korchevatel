@@ -105,7 +105,7 @@
   },
   {
     "id": 1,
-    "name": "korchevatel::camera::CameraCache",
+    "name": "korchevatel::camera::CameraSettings",
     "type": "class",
     "useAs": [
       "property"
@@ -114,6 +114,33 @@
     "drawFill": true,
     "members": [
       {
+        "name": "dead_zone_percentage",
+        "propertyType": "glam::Vec2",
+        "type": "class",
+        "value": null
+      },
+      {
+        "name": "max_look_ahead",
+        "propertyType": "glam::Vec2",
+        "type": "class",
+        "value": null
+      },
+      {
+        "name": "low_smooth",
+        "type": "float",
+        "value": null
+      },
+      {
+        "name": "high_smooth",
+        "type": "float",
+        "value": null
+      },
+      {
+        "name": "follow_smooth",
+        "type": "float",
+        "value": null
+      },
+      {
         "name": "half_view",
         "propertyType": "glam::Vec2",
         "type": "class",
@@ -121,6 +148,18 @@
       },
       {
         "name": "dead_zone",
+        "propertyType": "glam::Vec2",
+        "type": "class",
+        "value": null
+      },
+      {
+        "name": "look_ahead_offset",
+        "propertyType": "glam::Vec2",
+        "type": "class",
+        "value": null
+      },
+      {
+        "name": "last_focus_pos",
         "propertyType": "glam::Vec2",
         "type": "class",
         "value": null
