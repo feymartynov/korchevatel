@@ -17,6 +17,7 @@
             "members": [
                 {
                     "name": "max",
+                    "propertyType": "glam::Vec2",
                     "type": "class",
                     "value": {
                         "x": 0,
@@ -25,6 +26,7 @@
                 },
                 {
                     "name": "min",
+                    "propertyType": "glam::Vec2",
                     "type": "class",
                     "value": {
                         "x": 0,
@@ -33,59 +35,6 @@
                 }
             ],
             "name": "bevy_math::rects::rect::Rect",
-            "type": "class",
-            "useAs": [
-                "property"
-            ]
-        },
-        {
-            "color": "#ff000000",
-            "drawFill": true,
-            "id": 5,
-            "members": [
-            ],
-            "name": "korchevatel::character::Character",
-            "type": "class",
-            "useAs": [
-                "property"
-            ]
-        },
-        {
-            "color": "#ff000000",
-            "drawFill": true,
-            "id": 7,
-            "members": [
-                {
-                    "name": "mask",
-                    "type": "int",
-                    "value": 0
-                }
-            ],
-            "name": "korchevatel::level::Layer",
-            "type": "class",
-            "useAs": [
-                "property"
-            ]
-        },
-        {
-            "color": "#ff000000",
-            "drawFill": true,
-            "id": 8,
-            "members": [
-            ],
-            "name": "korchevatel::movement::Ground",
-            "type": "class",
-            "useAs": [
-                "property"
-            ]
-        },
-        {
-            "color": "#ff000000",
-            "drawFill": true,
-            "id": 1,
-            "members": [
-            ],
-            "name": "korchevatel::player::PlayerSpawnPoint",
             "type": "class",
             "useAs": [
                 "property"
@@ -188,6 +137,35 @@
         {
             "color": "#ff000000",
             "drawFill": true,
+            "id": 5,
+            "members": [
+            ],
+            "name": "korchevatel::character::Character",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 7,
+            "members": [
+                {
+                    "name": "mask",
+                    "type": "int",
+                    "value": 0
+                }
+            ],
+            "name": "korchevatel::level::Layer",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
             "id": 14,
             "members": [
                 {
@@ -232,6 +210,18 @@
                 "Right"
             ],
             "valuesAsFlags": false
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 8,
+            "members": [
+            ],
+            "name": "korchevatel::movement::Ground",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
         },
         {
             "color": "#ff000000",
@@ -358,6 +348,227 @@
             "useAs": [
                 "property"
             ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 1,
+            "members": [
+                {
+                    "name": "character",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "name": "korchevatel::player::PlayerSpawnPoint",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 23,
+            "members": [
+                {
+                    "name": ":variant",
+                    "propertyType": "bevy_time::timer::TimerMode:::Variant",
+                    "type": "string",
+                    "value": "Once"
+                }
+            ],
+            "name": "bevy_time::timer::TimerMode",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "id": 24,
+            "name": "bevy_time::timer::TimerMode:::Variant",
+            "storageType": "string",
+            "type": "enum",
+            "values": [
+                "Once",
+                "Repeating"
+            ],
+            "valuesAsFlags": false
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 25,
+            "members": [
+                {
+                    "name": "x",
+                    "type": "float",
+                    "value": 0
+                },
+                {
+                    "name": "y",
+                    "type": "float",
+                    "value": 0
+                }
+            ],
+            "name": "glam::Vec2",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 26,
+            "members": [
+                {
+                    "name": "dead_zone",
+                    "propertyType": "glam::Vec2",
+                    "type": "class",
+                    "value": {
+                    }
+                },
+                {
+                    "name": "dead_zone_percentage",
+                    "propertyType": "glam::Vec2",
+                    "type": "class",
+                    "value": {
+                    }
+                },
+                {
+                    "name": "follow_smooth",
+                    "type": "float",
+                    "value": 0
+                },
+                {
+                    "name": "half_view",
+                    "propertyType": "glam::Vec2",
+                    "type": "class",
+                    "value": {
+                    }
+                },
+                {
+                    "name": "high_smooth",
+                    "type": "float",
+                    "value": 0
+                },
+                {
+                    "name": "last_focus_pos",
+                    "propertyType": "glam::Vec2",
+                    "type": "class",
+                    "value": {
+                    }
+                },
+                {
+                    "name": "look_ahead_offset",
+                    "propertyType": "glam::Vec2",
+                    "type": "class",
+                    "value": {
+                    }
+                },
+                {
+                    "name": "low_smooth",
+                    "type": "float",
+                    "value": 0
+                },
+                {
+                    "name": "max_look_ahead",
+                    "propertyType": "glam::Vec2",
+                    "type": "class",
+                    "value": {
+                    }
+                }
+            ],
+            "name": "korchevatel::camera::CameraSettings",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 27,
+            "members": [
+                {
+                    "name": "attack_mode",
+                    "propertyType": "korchevatel::character::animation::AttackMode",
+                    "type": "class",
+                    "value": {
+                    }
+                },
+                {
+                    "name": "movement_mode",
+                    "propertyType": "korchevatel::character::animation::MovementMode",
+                    "type": "class",
+                    "value": {
+                    }
+                }
+            ],
+            "name": "korchevatel::character::animation::AnimationState",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 28,
+            "members": [
+                {
+                    "name": ":variant",
+                    "propertyType": "korchevatel::character::animation::AttackMode:::Variant",
+                    "type": "string",
+                    "value": "None"
+                }
+            ],
+            "name": "korchevatel::character::animation::AttackMode",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "id": 29,
+            "name": "korchevatel::character::animation::AttackMode:::Variant",
+            "storageType": "string",
+            "type": "enum",
+            "values": [
+                "None",
+                "Firing"
+            ],
+            "valuesAsFlags": false
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 30,
+            "members": [
+                {
+                    "name": ":variant",
+                    "propertyType": "korchevatel::character::animation::MovementMode:::Variant",
+                    "type": "string",
+                    "value": "Idle"
+                }
+            ],
+            "name": "korchevatel::character::animation::MovementMode",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "id": 31,
+            "name": "korchevatel::character::animation::MovementMode:::Variant",
+            "storageType": "string",
+            "type": "enum",
+            "values": [
+                "Idle",
+                "Walking"
+            ],
+            "valuesAsFlags": false
         }
     ]
 }

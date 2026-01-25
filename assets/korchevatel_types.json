@@ -500,6 +500,12 @@
     ],
     "color": "#000000",
     "drawFill": true,
-    "members": []
+    "members": [
+      {
+        "name": "character",
+        "type": "string",
+        "value": null
+      }
+    ]
   }
 ]

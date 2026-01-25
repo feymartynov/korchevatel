@@ -150,21 +150,23 @@ impl Animation {
     }
 }
 
-#[derive(Reflect, Hash, Eq, PartialEq, Default, Debug, Copy, Clone)]
+#[derive(Reflect, Hash, Eq, PartialEq, Default, Debug, Copy, Clone, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum MovementMode {
     #[default]
     Idle,
     Walking,
 }
 
-#[derive(Reflect, Hash, Eq, PartialEq, Default, Debug, Copy, Clone)]
+#[derive(Reflect, Hash, Eq, PartialEq, Default, Debug, Copy, Clone, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum AttackMode {
     #[default]
     None,
     Firing,
 }
 
-#[derive(Reflect, Hash, Eq, PartialEq, Default, Debug, Copy, Clone)]
+#[derive(Reflect, Hash, Eq, PartialEq, Default, Debug, Copy, Clone, Deserialize)]
 pub struct AnimationState {
     pub movement_mode: MovementMode,
     pub attack_mode: AttackMode,

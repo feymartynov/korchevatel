@@ -1,5 +1,6 @@
 mod animation;
 mod attack;
+mod registry;
 
 use std::time::Duration;
 
@@ -9,59 +10,9 @@ use bevy::sprite::Anchor;
 
 use crate::movement::MovementBundle;
 
-pub use self::animation::{Animation, AnimationState, AttackMode, MovementMode};
+pub use self::animation::{Animation, AnimationState};
 pub use self::attack::Attack;
-
-////////////////////////////////////////////////////////////////////////////////
-
-pub static CHARACTER_NIKITA: Character = Character {
-    name: "Nikita",
-    sprite_sheet: SpriteSheet {
-        path: "images/characters/nikita.png",
-        size: UVec2::new(227, 240),
-        columns: 15,
-        rows: 1,
-    },
-    anchor: Vec2::new(-0.12, 0.0),
-    collider_radius: 40.0,
-    collider_length: 150.0,
-    animations: &[
-        AnimationConfig {
-            state: AnimationState {
-                movement_mode: MovementMode::Idle,
-                attack_mode: AttackMode::None,
-            },
-            duration: Duration::from_millis(500),
-            sprite_indexes: &[0],
-        },
-        AnimationConfig {
-            state: AnimationState {
-                movement_mode: MovementMode::Walking,
-                attack_mode: AttackMode::None,
-            },
-            duration: Duration::from_millis(100),
-            sprite_indexes: &[1, 2, 3, 4, 5, 6],
-        },
-        AnimationConfig {
-            state: AnimationState {
-                movement_mode: MovementMode::Idle,
-                attack_mode: AttackMode::Firing,
-            },
-            duration: Duration::from_millis(100),
-            sprite_indexes: &[7, 8],
-        },
-        AnimationConfig {
-            state: AnimationState {
-                movement_mode: MovementMode::Walking,
-                attack_mode: AttackMode::Firing,
-            },
-            duration: Duration::from_millis(100),
-            sprite_indexes: &[9, 10, 11, 12, 13, 14],
-        },
-    ],
-};
-
-////////////////////////////////////////////////////////////////////////////////
+pub use self::registry::Registry;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(animation::plugin);
@@ -69,19 +20,19 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 /// Персонаж
-#[derive(Component, Clone)]
+#[derive(Component, Clone, Debug, Deserialize)]
 pub struct Character {
-    name: &'static str,
+    name: String,
     sprite_sheet: SpriteSheet,
     anchor: Vec2,
     collider_radius: f32,
     collider_length: f32,
-    animations: &'static [AnimationConfig],
+    animations: Vec<AnimationConfig>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize)]
 struct SpriteSheet {
-    path: &'static str,
+    path: String,
     size: UVec2,
     columns: u32,
     rows: u32,
@@ -93,11 +44,13 @@ impl SpriteSheet {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize)]
 struct AnimationConfig {
+    #[serde(flatten)]
     state: AnimationState,
+    #[serde(with = "humantime_serde")]
     duration: Duration,
-    sprite_indexes: &'static [usize],
+    sprite_indexes: Vec<usize>,
 }
 
 /// Добавляет графику, физику и логику персонажа (играбельного или нет) к сущности
@@ -117,7 +70,7 @@ fn on_insert(
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     let mut animation = Animation::default();
 
-    for animation_config in character.animations {
+    for animation_config in &character.animations {
         animation = animation.register_state(
             animation_config.state,
             animation_config.duration,
@@ -126,7 +79,7 @@ fn on_insert(
     }
 
     commands.entity(inserted.entity).insert((
-        Name::new(character.name),
+        Name::new(character.name.clone()),
         Anchor::from(character.anchor),
         RigidBody::Dynamic,
         Collider::capsule(character.collider_radius, character.collider_length),
@@ -134,7 +87,7 @@ fn on_insert(
         MovementBundle::default(),
         Attack::default(),
         Sprite {
-            image: asset_server.load(character.sprite_sheet.path),
+            image: asset_server.load(&character.sprite_sheet.path),
             texture_atlas: Some(TextureAtlas {
                 layout: texture_atlas_layout,
                 index: 0,

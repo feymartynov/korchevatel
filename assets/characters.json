@@ -1,0 +1,40 @@
+[
+  {
+    "name": "Nikita",
+    "sprite_sheet": {
+      "path": "images/characters/nikita.png",
+      "size": [ 227, 240 ],
+      "columns": 15,
+      "rows": 1
+    },
+    "anchor": [ -0.12, 0.0 ],
+    "collider_radius": 40,
+    "collider_length": 150,
+    "animations": [
+      {
+        "movement_mode": "idle",
+        "attack_mode": "none",
+        "duration": "500ms",
+        "sprite_indexes": [ 0 ]
+      },
+      {
+        "movement_mode": "walking",
+        "attack_mode": "none",
+        "duration": "100ms",
+        "sprite_indexes": [ 1, 2, 3, 4, 5, 6 ]
+      },
+      {
+        "movement_mode": "idle",
+        "attack_mode": "firing",
+        "duration": "100ms",
+        "sprite_indexes": [ 7, 8 ]
+      },
+      {
+        "movement_mode": "walking",
+        "attack_mode": "firing",
+        "duration": "100ms",
+        "sprite_indexes": [ 9, 10, 11, 12, 13, 14 ]
+      }
+    ]
+  }
+]

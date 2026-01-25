@@ -2,7 +2,7 @@ use avian2d::prelude::*;
 use bevy::prelude::*;
 
 use crate::camera::FocusPoint;
-use crate::character::{Attack, CHARACTER_NIKITA};
+use crate::character::{Attack, Registry as CharacterRegistry};
 use crate::level::Layer;
 use crate::movement::{MovementInput, MovementMessage};
 
@@ -19,19 +19,21 @@ pub(super) fn plugin(app: &mut App) {
 pub struct Player;
 
 /// Точка, где появляется игрок
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
+#[derive(Component, Debug, Clone, PartialEq, Eq, Default, Reflect)]
 #[require(Transform)]
 #[reflect(Component)]
-pub struct PlayerSpawnPoint;
+pub struct PlayerSpawnPoint {
+    character: String,
+}
 
 // Создание игрового персонажа
 fn spawn(
-    player_spawn_point_q: Query<(&Transform, &Layer), (With<PlayerSpawnPoint>, Added<Layer>)>,
+    player_spawn_point_q: Query<(&Transform, &Layer, &PlayerSpawnPoint), Added<Layer>>,
     player_q: Query<Entity, With<Player>>,
     mut camera_q: Query<Entity, With<IsDefaultUiCamera>>,
     mut commands: Commands,
 ) {
-    let Ok((transform, layer)) = player_spawn_point_q.single() else {
+    let Ok((transform, layer, spawn_point)) = player_spawn_point_q.single() else {
         return;
     };
 
@@ -40,10 +42,15 @@ fn spawn(
         return;
     }
 
+    let Some(character) = CharacterRegistry::with(&spawn_point.character, |c| c.cloned()) else {
+        error!("Missing player character {}", spawn_point.character);
+        return;
+    };
+
     let player = commands
         .spawn((
             Name::new("Player"),
-            CHARACTER_NIKITA.clone(),
+            character.clone(),
             Player,
             *transform,
             *layer,
@@ -70,7 +77,7 @@ fn control(
     let Ok((player, mut movement_input, mut attack)) = q.single_mut() else {
         return;
     };
-    
+
     // Перемещение
     let left = keyboard_input.pressed(KeyCode::KeyA);
     let right = keyboard_input.pressed(KeyCode::KeyD);

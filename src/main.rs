@@ -1,5 +1,10 @@
 #![allow(clippy::type_complexity)]
 
+#[macro_use]
+extern crate anyhow;
+#[macro_use]
+extern crate serde;
+
 mod camera;
 mod character;
 #[cfg(debug_assertions)]
@@ -10,12 +15,14 @@ mod player;
 
 use std::env;
 
+use anyhow::{Context, Result};
 use avian2d::prelude::*;
 use bevy::asset::AssetMetaCheck;
 use bevy::prelude::*;
 use bevy_ecs_tiled::prelude::*;
 
-fn main() {
+fn main() -> Result<()> {
+    self::character::Registry::load().context("Load character registry")?;
     let mut app = App::new();
 
     app.add_plugins((
@@ -64,4 +71,5 @@ fn main() {
     app.insert_resource(ClearColor(Color::srgb_u8(64, 64, 64)));
     app.insert_resource(Gravity(Vec2::NEG_Y * 1000.0));
     app.run();
+    Ok(())
 }
