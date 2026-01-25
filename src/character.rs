@@ -1,4 +1,5 @@
 mod animation;
+mod attack;
 
 use std::time::Duration;
 
@@ -8,7 +9,8 @@ use bevy::sprite::Anchor;
 
 use crate::movement::MovementBundle;
 
-pub use animation::{Animation, AnimationState};
+pub use self::animation::{Animation, AnimationState, AttackMode, MovementMode};
+pub use self::attack::Attack;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -16,8 +18,8 @@ pub static CHARACTER_NIKITA: Character = Character {
     name: "Nikita",
     sprite_sheet: SpriteSheet {
         path: "images/characters/nikita.png",
-        size: UVec2::new(201, 240),
-        columns: 7,
+        size: UVec2::new(227, 240),
+        columns: 15,
         rows: 1,
     },
     anchor: Vec2::new(-0.12, 0.0),
@@ -25,14 +27,36 @@ pub static CHARACTER_NIKITA: Character = Character {
     collider_length: 150.0,
     animations: &[
         AnimationConfig {
-            state: AnimationState::Idling,
+            state: AnimationState {
+                movement_mode: MovementMode::Idle,
+                attack_mode: AttackMode::None,
+            },
             duration: Duration::from_millis(500),
             sprite_indexes: &[0],
         },
         AnimationConfig {
-            state: AnimationState::Walking,
+            state: AnimationState {
+                movement_mode: MovementMode::Walking,
+                attack_mode: AttackMode::None,
+            },
             duration: Duration::from_millis(100),
             sprite_indexes: &[1, 2, 3, 4, 5, 6],
+        },
+        AnimationConfig {
+            state: AnimationState {
+                movement_mode: MovementMode::Idle,
+                attack_mode: AttackMode::Firing,
+            },
+            duration: Duration::from_millis(100),
+            sprite_indexes: &[7, 8],
+        },
+        AnimationConfig {
+            state: AnimationState {
+                movement_mode: MovementMode::Walking,
+                attack_mode: AttackMode::Firing,
+            },
+            duration: Duration::from_millis(100),
+            sprite_indexes: &[9, 10, 11, 12, 13, 14],
         },
     ],
 };
@@ -108,6 +132,7 @@ fn on_insert(
         Collider::capsule(character.collider_radius, character.collider_length),
         LockedAxes::ROTATION_LOCKED,
         MovementBundle::default(),
+        Attack::default(),
         Sprite {
             image: asset_server.load(character.sprite_sheet.path),
             texture_atlas: Some(TextureAtlas {

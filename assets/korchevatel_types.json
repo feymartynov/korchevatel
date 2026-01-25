@@ -1,6 +1,6 @@
 [
   {
-    "id": 26,
+    "id": 29,
     "name": "bevy_math::rects::rect::Rect",
     "type": "class",
     "useAs": [
@@ -30,7 +30,7 @@
     ]
   },
   {
-    "id": 25,
+    "id": 24,
     "name": "bevy_time::timer::TimerMode",
     "type": "class",
     "useAs": [
@@ -48,7 +48,7 @@
     ]
   },
   {
-    "id": 24,
+    "id": 23,
     "name": "bevy_time::timer::TimerMode:::Variant",
     "type": "enum",
     "storageType": "string",
@@ -213,7 +213,7 @@
     ]
   },
   {
-    "id": 22,
+    "id": 21,
     "name": "korchevatel::character::animation::AnimationState",
     "type": "class",
     "useAs": [
@@ -223,20 +223,73 @@
     "drawFill": true,
     "members": [
       {
-        "name": ":variant",
-        "propertyType": "korchevatel::character::animation::AnimationState:::Variant",
-        "type": "class",
-        "value": "Idling"
+        "name": "movement_mode",
+        "propertyType": "korchevatel::character::animation::MovementMode",
+        "type": "string",
+        "value": null
+      },
+      {
+        "name": "attack_mode",
+        "propertyType": "korchevatel::character::animation::AttackMode",
+        "type": "string",
+        "value": null
       }
     ]
   },
   {
-    "id": 21,
-    "name": "korchevatel::character::animation::AnimationState:::Variant",
+    "id": 28,
+    "name": "korchevatel::character::animation::AttackMode",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": [
+      {
+        "name": ":variant",
+        "propertyType": "korchevatel::character::animation::AttackMode:::Variant",
+        "type": "class",
+        "value": "None"
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "name": "korchevatel::character::animation::AttackMode:::Variant",
     "type": "enum",
     "storageType": "string",
     "values": [
-      "Idling",
+      "None",
+      "Firing"
+    ],
+    "valuesAsFlags": false
+  },
+  {
+    "id": 26,
+    "name": "korchevatel::character::animation::MovementMode",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": [
+      {
+        "name": ":variant",
+        "propertyType": "korchevatel::character::animation::MovementMode:::Variant",
+        "type": "class",
+        "value": "Idle"
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "name": "korchevatel::character::animation::MovementMode:::Variant",
+    "type": "enum",
+    "storageType": "string",
+    "values": [
+      "Idle",
       "Walking"
     ],
     "valuesAsFlags": false

@@ -4,6 +4,7 @@ use avian2d::prelude::*;
 use bevy::platform::collections::HashMap;
 use bevy::prelude::*;
 
+use crate::character::Attack;
 use crate::movement::Direction;
 
 const DELTA_X: f32 = 10.0;
@@ -23,14 +24,15 @@ pub(super) fn plugin(app: &mut App) {
 
 /// Анимация движения персонажа
 fn update_animation_movement(
-    mut player_query: Query<(
+    mut q: Query<(
         &LinearVelocity,
         &Direction,
+        Option<&Attack>,
         &mut Sprite,
         &mut Animation,
     )>,
 ) {
-    for (linear_velocity, direction, mut sprite, mut animation) in &mut player_query {
+    for (linear_velocity, direction, maybe_attack, mut sprite, mut animation) in &mut q {
         let dx = linear_velocity.x;
 
         // Разворот в зависимости от направления взгляда
@@ -39,12 +41,24 @@ fn update_animation_movement(
         }
 
         // Стоит или идёт в зависимости от скорости
-        let animation_state = if ops::abs(dx) < DELTA_X {
-            AnimationState::Idling
+        let movement_mode = if ops::abs(dx) >= DELTA_X {
+            MovementMode::Walking
         } else {
-            AnimationState::Walking
+            MovementMode::Idle
         };
 
+        // Атакует или нет
+        let is_attacking = maybe_attack
+            .map(|attack| attack.is_attacking())
+            .unwrap_or_default();
+
+        let attack_mode = if is_attacking {
+            AttackMode::Firing
+        } else {
+            AttackMode::None
+        };
+
+        let animation_state = AnimationState { movement_mode, attack_mode };
         animation.change_state(animation_state);
     }
 }
@@ -79,13 +93,6 @@ pub struct Animation {
     config: HashMap<AnimationState, (Duration, Vec<usize>)>,
 }
 
-#[derive(Reflect, Hash, Eq, PartialEq, Default, Debug, Copy, Clone)]
-pub enum AnimationState {
-    #[default]
-    Idling,
-    Walking,
-}
-
 impl Animation {
     /// Регистрация анимации для персонажа
     pub fn register_state(
@@ -116,8 +123,14 @@ impl Animation {
         if self.state != state
             && let Some((duration, _)) = self.config.get(&state)
         {
+            let old_state = self.state;
             self.state = state;
-            self.frame_index = 0;
+            
+            // Сохраняем фазу движения, если режим не сменился
+            if state.movement_mode != old_state.movement_mode {
+                self.frame_index = 0;
+            }
+
             self.timer = Timer::new(*duration, TimerMode::Repeating);
         }
     }
@@ -135,4 +148,24 @@ impl Animation {
             .and_then(|(_, frames)| frames.get(self.frame_index))
             .unwrap_or(&0)
     }
+}
+
+#[derive(Reflect, Hash, Eq, PartialEq, Default, Debug, Copy, Clone)]
+pub enum MovementMode {
+    #[default]
+    Idle,
+    Walking,
+}
+
+#[derive(Reflect, Hash, Eq, PartialEq, Default, Debug, Copy, Clone)]
+pub enum AttackMode {
+    #[default]
+    None,
+    Firing,
+}
+
+#[derive(Reflect, Hash, Eq, PartialEq, Default, Debug, Copy, Clone)]
+pub struct AnimationState {
+    pub movement_mode: MovementMode,
+    pub attack_mode: AttackMode,
 }

@@ -2,7 +2,7 @@ use avian2d::prelude::*;
 use bevy::prelude::*;
 
 use crate::camera::FocusPoint;
-use crate::character::CHARACTER_NIKITA;
+use crate::character::{Attack, CHARACTER_NIKITA};
 use crate::level::Layer;
 use crate::movement::{MovementInput, MovementMessage};
 
@@ -60,17 +60,18 @@ fn spawn(
 fn control(
     physics_time: Res<Time<Physics>>,
     mut movement_event_writer: MessageWriter<MovementMessage>,
-    mut movement_input_q: Query<(Entity, &mut MovementInput), With<Player>>,
+    mut q: Query<(Entity, &mut MovementInput, &mut Attack), With<Player>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
     if physics_time.is_paused() {
         return;
     }
 
-    let Ok((player, mut movement_input)) = movement_input_q.single_mut() else {
+    let Ok((player, mut movement_input, mut attack)) = q.single_mut() else {
         return;
     };
-
+    
+    // Перемещение
     let left = keyboard_input.pressed(KeyCode::KeyA);
     let right = keyboard_input.pressed(KeyCode::KeyD);
     movement_input.x_direction = (right as i8 - left as i8).into();
@@ -86,4 +87,7 @@ fn control(
             z_direction,
         });
     }
+
+    // Атака
+    attack.set_attacking(keyboard_input.pressed(KeyCode::Space));
 }
