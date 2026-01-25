@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="20">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="21">
  <tileset firstgid="1" source="cars.tsx"/>
  <imagelayer id="2" name="Background" locked="1">
   <image source="images/street.png" width="3072" height="1024"/>
@@ -36,6 +36,16 @@
    <properties>
     <property name="Ground" type="class" propertytype="korchevatel::movement::Ground"/>
    </properties>
+  </object>
+  <object id="20" name="Hobo with a shotgun" x="1462.52" y="814.362">
+   <properties>
+    <property name="MobSpawnPoint" type="class" propertytype="korchevatel::mob::MobSpawnPoint">
+     <properties>
+      <property name="character" value="Nikita"/>
+     </properties>
+    </property>
+   </properties>
+   <point/>
   </object>
  </objectgroup>
 </map>

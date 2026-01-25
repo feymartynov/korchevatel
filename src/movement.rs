@@ -123,7 +123,7 @@ struct MaxSlopeAngle(Scalar);
 
 /// Переход, между слоями
 /// Этот компонент добавляется только на время перехода
-#[derive(Component, Reflect)]
+#[derive(Component, Reflect, Debug)]
 #[reflect(Component)]
 pub struct ZMoving {
     from_layer: Layer,
@@ -281,7 +281,7 @@ fn do_move(
 
         // Начало перехода между слоями, если была команда
         let new_layer = match z_direction.cmp(&0) {
-            Ordering::Equal => return,
+            Ordering::Equal => continue,
             Ordering::Greater => layer.next(),
             Ordering::Less => layer.prev(),
         };
@@ -353,16 +353,19 @@ fn do_move(
         let z_moving_time = (from_y - to_y) / speed.z_speed;
         let scale_velocity = (Z_SCALE_FACTOR - 1.0) / z_moving_time;
 
-        // Помечаем объект как перемещающийся по Z
-        commands.entity(entity).insert(ZMoving {
-            from_layer: *layer,
-            to_layer: new_layer,
-            to_y,
-            scale_velocity,
-        });
+        commands.entity(entity).insert((
+            // Помечаем объект как перемещающийся по Z
+            ZMoving {
+                from_layer: *layer,
+                to_layer: new_layer,
+                to_y,
+                scale_velocity,
+            },
+            // Временно отключаем проверки на столкновения
+            ColliderDisabled,
+        ));
 
-        // Временно отключаем проверки на столкновения и гравитацию
-        commands.entity(entity).insert(ColliderDisabled);
+        // Временно отключаем гравитацию
         gravity_scale.0 = 0.0;
 
         // Запускаем движение по Y

@@ -9,7 +9,8 @@ use crate::movement::{MovementInput, MovementMessage};
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Player>();
     app.register_type::<PlayerSpawnPoint>();
-    app.add_systems(Update, (spawn, control));
+    app.add_systems(FixedUpdate, spawn);
+    app.add_systems(Update, control);
 }
 
 /// Игровой персонаж
@@ -49,7 +50,7 @@ fn spawn(
 
     let player = commands
         .spawn((
-            Name::new("Player"),
+            Name::new(format!("Player {}", character.name())),
             character.clone(),
             Player,
             *transform,

@@ -30,6 +30,12 @@ pub struct Character {
     animations: Vec<AnimationConfig>,
 }
 
+impl Character {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+}
+
 #[derive(Clone, Debug, Deserialize)]
 struct SpriteSheet {
     path: String,
@@ -79,7 +85,6 @@ fn on_insert(
     }
 
     commands.entity(inserted.entity).insert((
-        Name::new(character.name.clone()),
         Anchor::from(character.anchor),
         RigidBody::Dynamic,
         Collider::capsule(character.collider_radius, character.collider_length),

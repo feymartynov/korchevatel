@@ -10,6 +10,7 @@ mod character;
 #[cfg(debug_assertions)]
 mod debug;
 mod level;
+mod mob;
 mod movement;
 mod player;
 
@@ -51,6 +52,7 @@ fn main() -> Result<()> {
         character::plugin,
         player::plugin,
         movement::plugin,
+        mob::plugin,
     ));
 
     let mut path = env::current_dir().expect("current dir");

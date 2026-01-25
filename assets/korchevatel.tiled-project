@@ -569,6 +569,35 @@
                 "Walking"
             ],
             "valuesAsFlags": false
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 32,
+            "members": [
+            ],
+            "name": "korchevatel::mob::Mob",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 33,
+            "members": [
+                {
+                    "name": "character",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "name": "korchevatel::mob::MobSpawnPoint",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
         }
     ]
 }

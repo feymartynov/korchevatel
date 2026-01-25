@@ -1,6 +1,6 @@
 [
   {
-    "id": 29,
+    "id": 31,
     "name": "bevy_math::rects::rect::Rect",
     "type": "class",
     "useAs": [
@@ -30,7 +30,7 @@
     ]
   },
   {
-    "id": 24,
+    "id": 26,
     "name": "bevy_time::timer::TimerMode",
     "type": "class",
     "useAs": [
@@ -48,7 +48,7 @@
     ]
   },
   {
-    "id": 23,
+    "id": 25,
     "name": "bevy_time::timer::TimerMode:::Variant",
     "type": "enum",
     "storageType": "string",
@@ -59,7 +59,7 @@
     "valuesAsFlags": false
   },
   {
-    "id": 19,
+    "id": 21,
     "name": "core::option::Option<bevy_ecs::entity::Entity>",
     "type": "class",
     "useAs": [
@@ -83,7 +83,7 @@
     ]
   },
   {
-    "id": 17,
+    "id": 19,
     "name": "core::option::Option<bevy_ecs::entity::Entity>:::Variant",
     "type": "enum",
     "storageType": "string",
@@ -94,7 +94,7 @@
     "valuesAsFlags": false
   },
   {
-    "id": 18,
+    "id": 20,
     "name": "core::option::Option<bevy_ecs::entity::Entity>::Some",
     "type": "class",
     "useAs": [
@@ -111,7 +111,7 @@
     ]
   },
   {
-    "id": 16,
+    "id": 18,
     "name": "glam::Vec2",
     "type": "class",
     "useAs": [
@@ -213,7 +213,7 @@
     ]
   },
   {
-    "id": 21,
+    "id": 23,
     "name": "korchevatel::character::animation::AnimationState",
     "type": "class",
     "useAs": [
@@ -237,7 +237,7 @@
     ]
   },
   {
-    "id": 28,
+    "id": 30,
     "name": "korchevatel::character::animation::AttackMode",
     "type": "class",
     "useAs": [
@@ -255,7 +255,7 @@
     ]
   },
   {
-    "id": 27,
+    "id": 29,
     "name": "korchevatel::character::animation::AttackMode:::Variant",
     "type": "enum",
     "storageType": "string",
@@ -266,7 +266,7 @@
     "valuesAsFlags": false
   },
   {
-    "id": 26,
+    "id": 28,
     "name": "korchevatel::character::animation::MovementMode",
     "type": "class",
     "useAs": [
@@ -284,7 +284,7 @@
     ]
   },
   {
-    "id": 25,
+    "id": 27,
     "name": "korchevatel::character::animation::MovementMode:::Variant",
     "type": "enum",
     "storageType": "string",
@@ -330,7 +330,35 @@
     ]
   },
   {
+    "id": 6,
+    "name": "korchevatel::mob::Mob",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": []
+  },
+  {
     "id": 7,
+    "name": "korchevatel::mob::MobSpawnPoint",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": [
+      {
+        "name": "character",
+        "type": "string",
+        "value": null
+      }
+    ]
+  },
+  {
+    "id": 9,
     "name": "korchevatel::movement::Direction",
     "type": "class",
     "useAs": [
@@ -348,7 +376,7 @@
     ]
   },
   {
-    "id": 6,
+    "id": 8,
     "name": "korchevatel::movement::Direction:::Variant",
     "type": "enum",
     "storageType": "string",
@@ -359,7 +387,7 @@
     "valuesAsFlags": false
   },
   {
-    "id": 8,
+    "id": 10,
     "name": "korchevatel::movement::Ground",
     "type": "class",
     "useAs": [
@@ -370,7 +398,7 @@
     "members": []
   },
   {
-    "id": 9,
+    "id": 11,
     "name": "korchevatel::movement::Grounded",
     "type": "class",
     "useAs": [
@@ -381,7 +409,7 @@
     "members": []
   },
   {
-    "id": 10,
+    "id": 12,
     "name": "korchevatel::movement::MaxSlopeAngle",
     "type": "class",
     "useAs": [
@@ -398,7 +426,7 @@
     ]
   },
   {
-    "id": 11,
+    "id": 13,
     "name": "korchevatel::movement::MovementInput",
     "type": "class",
     "useAs": [
@@ -420,7 +448,7 @@
     ]
   },
   {
-    "id": 12,
+    "id": 14,
     "name": "korchevatel::movement::MovementSpeed",
     "type": "class",
     "useAs": [
@@ -447,7 +475,7 @@
     ]
   },
   {
-    "id": 13,
+    "id": 15,
     "name": "korchevatel::movement::ZMoving",
     "type": "class",
     "useAs": [
@@ -481,7 +509,7 @@
     ]
   },
   {
-    "id": 14,
+    "id": 16,
     "name": "korchevatel::player::Player",
     "type": "class",
     "useAs": [
@@ -492,7 +520,7 @@
     "members": []
   },
   {
-    "id": 15,
+    "id": 17,
     "name": "korchevatel::player::PlayerSpawnPoint",
     "type": "class",
     "useAs": [
