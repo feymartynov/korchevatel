@@ -1,6 +1,6 @@
 [
   {
-    "id": 20,
+    "id": 26,
     "name": "bevy_math::rects::rect::Rect",
     "type": "class",
     "useAs": [
@@ -28,6 +28,35 @@
         }
       }
     ]
+  },
+  {
+    "id": 25,
+    "name": "bevy_time::timer::TimerMode",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": [
+      {
+        "name": ":variant",
+        "propertyType": "bevy_time::timer::TimerMode:::Variant",
+        "type": "class",
+        "value": "Once"
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "name": "bevy_time::timer::TimerMode:::Variant",
+    "type": "enum",
+    "storageType": "string",
+    "values": [
+      "Once",
+      "Repeating"
+    ],
+    "valuesAsFlags": false
   },
   {
     "id": 19,
@@ -184,15 +213,33 @@
     ]
   },
   {
-    "id": 3,
-    "name": "korchevatel::character::Character",
+    "id": 22,
+    "name": "korchevatel::character::animation::AnimationState",
     "type": "class",
     "useAs": [
       "property"
     ],
     "color": "#000000",
     "drawFill": true,
-    "members": []
+    "members": [
+      {
+        "name": ":variant",
+        "propertyType": "korchevatel::character::animation::AnimationState:::Variant",
+        "type": "class",
+        "value": "Idling"
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "name": "korchevatel::character::animation::AnimationState:::Variant",
+    "type": "enum",
+    "storageType": "string",
+    "values": [
+      "Idling",
+      "Walking"
+    ],
+    "valuesAsFlags": false
   },
   {
     "id": 4,

@@ -2,7 +2,7 @@ use avian2d::prelude::*;
 use bevy::prelude::*;
 
 use crate::camera::FocusPoint;
-use crate::character::Character;
+use crate::character::CHARACTER_NIKITA;
 use crate::level::Layer;
 use crate::movement::{MovementInput, MovementMessage};
 
@@ -14,7 +14,7 @@ pub(super) fn plugin(app: &mut App) {
 
 /// Игровой персонаж
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
-#[require(Transform, Visibility, Character)]
+#[require(Transform, Visibility)]
 #[reflect(Component)]
 pub struct Player;
 
@@ -41,7 +41,13 @@ fn spawn(
     }
 
     let player = commands
-        .spawn((Name::new("Player"), Character, Player, *transform, *layer))
+        .spawn((
+            Name::new("Player"),
+            CHARACTER_NIKITA.clone(),
+            Player,
+            *transform,
+            *layer,
+        ))
         .id();
 
     // Наводим камеру на игрока
