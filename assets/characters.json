@@ -36,5 +36,33 @@
         "sprite_indexes": [ 9, 10, 11, 12, 13, 14 ]
       }
     ]
+  },
+  {
+
+    "name": "Hobo with a shotgun",
+    "sprite_sheet": {
+      "path": "images/characters/hobo_with_a_shotgun.png",
+      "size": [ 243, 240 ],
+      "columns": 7,
+      "rows": 1
+    },
+    "anchor": [ -0.12, 0.0 ],
+    "collider_radius": 40,
+    "collider_length": 150,
+    "animations": [
+      {
+        "movement_mode": "idle",
+        "attack_mode": "none",
+        "duration": "500ms",
+        "sprite_indexes": [ 0 ]
+      },
+      {
+        "movement_mode": "walking",
+        "attack_mode": "none",
+        "duration": "100ms",
+        "sprite_indexes": [ 1, 2, 3, 4, 5, 6 ]
+      }
+    ]
+
   }
 ]

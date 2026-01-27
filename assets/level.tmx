@@ -41,7 +41,7 @@
    <properties>
     <property name="MobSpawnPoint" type="class" propertytype="korchevatel::mob::MobSpawnPoint">
      <properties>
-      <property name="character" value="Nikita"/>
+      <property name="character" value="Hobo with a shotgun"/>
      </properties>
     </property>
    </properties>
