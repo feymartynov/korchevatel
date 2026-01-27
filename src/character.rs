@@ -10,12 +10,14 @@ use bevy::sprite::Anchor;
 
 use crate::movement::MovementBundle;
 
+use self::attack::Attack;
+
 pub use self::animation::{Animation, AnimationState};
-pub use self::attack::Attack;
+pub use self::attack::AttackMessage;
 pub use self::registry::Registry;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_plugins(animation::plugin);
+    app.add_plugins((animation::plugin, attack::plugin));
     app.add_observer(on_insert);
 }
 

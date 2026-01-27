@@ -2,7 +2,7 @@ use avian2d::prelude::*;
 use bevy::prelude::*;
 
 use crate::camera::FocusPoint;
-use crate::character::{Attack, Registry as CharacterRegistry};
+use crate::character::{AttackMessage, Registry as CharacterRegistry};
 use crate::level::Layer;
 use crate::movement::{MovementInput, MovementMessage};
 
@@ -68,14 +68,15 @@ fn spawn(
 fn control(
     physics_time: Res<Time<Physics>>,
     mut movement_event_writer: MessageWriter<MovementMessage>,
-    mut q: Query<(Entity, &mut MovementInput, &mut Attack), With<Player>>,
+    mut attack_event_writer: MessageWriter<AttackMessage>,
+    mut q: Query<(Entity, &mut MovementInput), With<Player>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
     if physics_time.is_paused() {
         return;
     }
 
-    let Ok((player, mut movement_input, mut attack)) = q.single_mut() else {
+    let Ok((player, mut movement_input)) = q.single_mut() else {
         return;
     };
 
@@ -97,5 +98,7 @@ fn control(
     }
 
     // Атака
-    attack.set_attacking(keyboard_input.pressed(KeyCode::Space));
+    if keyboard_input.pressed(KeyCode::Space) {
+        attack_event_writer.write(AttackMessage::Attack { attacker: player });
+    }
 }

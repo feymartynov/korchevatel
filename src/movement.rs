@@ -64,6 +64,15 @@ pub enum Direction {
     Right,
 }
 
+impl From<Direction> for Dir2 {
+    fn from(direction: Direction) -> Self {
+        match direction {
+            Direction::Left => Dir2::from_xy(-1.0, 0.0).expect("direction"),
+            Direction::Right => Dir2::from_xy(1.0, 0.0).expect("direction"),
+        }
+    }
+}
+
 /// Характеристики движения
 #[derive(Bundle)]
 pub struct MovementBundle {

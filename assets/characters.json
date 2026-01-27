@@ -46,8 +46,8 @@
       "columns": 7,
       "rows": 1
     },
-    "anchor": [ -0.12, 0.0 ],
-    "collider_radius": 40,
+    "anchor": [ -0.05, 0.0 ],
+    "collider_radius": 45,
     "collider_length": 150,
     "animations": [
       {

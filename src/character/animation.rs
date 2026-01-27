@@ -58,7 +58,10 @@ fn update_animation_movement(
             AttackMode::None
         };
 
-        let animation_state = AnimationState { movement_mode, attack_mode };
+        let animation_state = AnimationState {
+            movement_mode,
+            attack_mode,
+        };
         animation.change_state(animation_state);
     }
 }
@@ -125,7 +128,7 @@ impl Animation {
         {
             let old_state = self.state;
             self.state = state;
-            
+
             // Сохраняем фазу движения, если режим не сменился
             if state.movement_mode != old_state.movement_mode {
                 self.frame_index = 0;

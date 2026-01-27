@@ -33,7 +33,7 @@ impl Registry {
 
     pub fn with<F, R>(name: &str, f: F) -> R
     where
-        F: FnOnce(Option<&Character>) -> R
+        F: FnOnce(Option<&Character>) -> R,
     {
         let lock = REGISTRY.read().expect("poisoned rwlock");
         f(lock.characters.get(name))
