@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-avian2d = { version = "0.4.1", features = ["debug-plugin", "bevy_diagnostic", "diagnostic_ui"] }
-bevy = { version = "0.17.3", features = ["debug"] }
-bevy_ecs_tiled = { version = "0.10.0", features = ["avian", "physics", "user_properties"] }
-bevy-inspector-egui = "0.35.0"
+avian2d = { version = "0.5.0", features = ["debug-plugin", "bevy_diagnostic", "diagnostic_ui"] }
+bevy = { version = "0.18.0", features = ["debug"] }
+bevy_ecs_tiled = { version = "0.11.2", features = ["avian", "physics", "user_properties"] }
+bevy-inspector-egui = "0.36.0"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 anyhow = "1.0.100"
