@@ -11,9 +11,9 @@ use bevy::sprite::Anchor;
 use crate::movement::MovementBundle;
 
 use self::attack::Attack;
+pub use self::attack::AttackInput;
 
 pub use self::animation::{Animation, AnimationState};
-pub use self::attack::AttackMessage;
 pub use self::registry::Registry;
 
 pub(super) fn plugin(app: &mut App) {
@@ -92,6 +92,7 @@ fn on_insert(
         Collider::capsule(character.collider_radius, character.collider_length),
         LockedAxes::ROTATION_LOCKED,
         MovementBundle::default(),
+        AttackInput::default(),
         Attack::default(),
         Sprite {
             image: asset_server.load(&character.sprite_sheet.path),

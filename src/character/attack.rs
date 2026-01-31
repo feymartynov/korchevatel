@@ -1,26 +1,45 @@
+use std::cmp::Ordering;
 use std::time::Duration;
 
 use avian2d::math::*;
 use avian2d::prelude::*;
+use bevy::ecs::entity::EntityHashSet;
 use bevy::prelude::*;
 
+use crate::character::Character;
 use crate::level::Layer;
 use crate::movement::Direction;
+use crate::movement::Ground;
 
 const ATTACK_TIME: Duration = Duration::from_millis(100);
 const COOLDOWN_TIME: Duration = Duration::from_millis(100);
-const MAX_DISTANCE: Scalar = 500.0;
+const MAX_X_DISTANCE: Scalar = 500.0;
+const MAX_Y_DISTANCE: Scalar = 100.0;
+const HIT_LIFETIME: Duration = Duration::from_millis(500);
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_message::<AttackMessage>();
-    app.add_systems(FixedUpdate, (apply_attack.before(attack), attack));
-    app.add_systems(Update, tick_timer.before(attack));
+    app.add_systems(FixedUpdate, attack);
+    app.add_systems(
+        Update,
+        (
+            tick_attack_timer.before(attack),
+            tick_hit_timer.after(attack),
+        ),
+    );
 }
 
-#[derive(Message)]
-pub enum AttackMessage {
-    /// Команда атаковать
-    Attack { attacker: Entity },
+#[derive(Component, Default)]
+pub enum AttackInput {
+    #[default]
+    Idle,
+    Attack,
+}
+
+impl AttackInput {
+    /// Атакует ли прямо сейчас?
+    pub fn is_attacking(&self) -> bool {
+        matches!(self, AttackInput::Attack)
+    }
 }
 
 /// Компонент атаки
@@ -40,38 +59,7 @@ enum State {
     Cooldown(Timer),
 }
 
-impl Attack {
-    /// Атакует ли прямо сейчас?
-    pub fn is_attacking(&self) -> bool {
-        matches!(self.state, State::Attack(_))
-    }
-}
-
-/// Команда на атаку
-fn apply_attack(mut message_reader: MessageReader<AttackMessage>, mut q: Query<&mut Attack>) {
-    for message in message_reader.read() {
-        match message {
-            AttackMessage::Attack { attacker } => {
-                let Ok(mut attack) = q.get_mut(*attacker) else {
-                    continue;
-                };
-
-                // Если не готов атаковать, игнорируем команду
-                if !matches!(attack.state, State::Idle) {
-                    continue;
-                }
-
-                // Заводим таймер атаки
-                attack.state = State::Attack(Timer::from_seconds(
-                    ATTACK_TIME.as_secs_f32(),
-                    TimerMode::Once,
-                ));
-            }
-        }
-    }
-}
-
-fn tick_timer(time: Res<Time>, q: Query<&mut Attack>) {
+fn tick_attack_timer(time: Res<Time>, q: Query<&mut Attack>) {
     for mut attack in q {
         match &mut attack.state {
             State::Idle => (),
@@ -82,35 +70,53 @@ fn tick_timer(time: Res<Time>, q: Query<&mut Attack>) {
     }
 }
 
+type HitEntityComponents<'a> = (&'a GlobalTransform, &'a Layer, Has<Character>, Has<Ground>);
+
 /// Стейт-машина атаки
-fn attack(q: Query<(&mut Attack, &Direction, &Layer, &GlobalTransform)>, spatial_q: SpatialQuery) {
-    for (mut attack, direction, layer, global_transform) in q {
+fn attack(
+    q: Query<(
+        Entity,
+        &mut Attack,
+        &AttackInput,
+        &Direction,
+        &GlobalTransform,
+        &Layer,
+    )>,
+    spatial_q: SpatialQuery,
+    hit_entity_q: Query<HitEntityComponents>,
+    mut commands: Commands,
+) {
+    for (attacker, mut attack, attack_input, direction, global_transform, layer) in q {
         match &attack.state {
-            State::Idle => (),
+            State::Idle => {
+                if !matches!(attack_input, AttackInput::Attack) {
+                    continue;
+                }
+
+                // Если не готов атаковать, игнорируем команду
+                if !matches!(attack.state, State::Idle) {
+                    return;
+                }
+
+                // Заводим таймер атаки
+                attack.state = State::Attack(Timer::from_seconds(
+                    ATTACK_TIME.as_secs_f32(),
+                    TimerMode::Once,
+                ));
+            }
             State::Attack(timer) => {
                 // Задержка на прицеливание
                 if !timer.is_finished() {
                     continue;
                 }
 
-                // Собственно, выстрел. Выпускаем виртуальный луч, смотрим во что попадёт
-                let maybe_hit = spatial_q.cast_ray(
-                    // TODO: От ружья, а не от центра персонажа
-                    global_transform.translation().truncate(),
-                    (*direction).into(),
-                    MAX_DISTANCE,
-                    false,
-                    &SpatialQueryFilter {
-                        // TODO: Стрельба между слоями
-                        mask: (*layer).into(),
-                        ..Default::default()
-                    },
-                );
+                // Если куда-то попали, отрабатываем попадание
+                let origin = global_transform.translation().truncate();
 
-                if let Some(hit_data) = maybe_hit {
-                    println!("Hit! {hit_data:?}");
-                } else {
-                    println!("Miss!");
+                if let Some(hit) =
+                    shoot(attacker, origin, layer, direction, &spatial_q, hit_entity_q)
+                {
+                    take_hit(&hit, &mut commands);
                 }
 
                 // Пауза перед следующей атакой
@@ -125,6 +131,154 @@ fn attack(q: Query<(&mut Attack, &Direction, &Layer, &GlobalTransform)>, spatial
                     attack.state = State::Idle;
                 }
             }
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+struct HitEntityBundle {
+    hit_data: ShapeHitData,
+    global_transform: GlobalTransform,
+    layer: Layer,
+    is_character: bool,
+}
+
+/// Стрельба
+fn shoot(
+    attacker: Entity,
+    origin: Vec2,
+    origin_layer: &Layer,
+    direction: &Direction,
+    spatial_q: &SpatialQuery,
+    hit_entity_q: Query<HitEntityComponents>,
+) -> Option<HitEntityBundle> {
+    // Находим все сущности на всех слоях, в которые можно попасть
+    let mut hits = Vec::new();
+
+    let mut filter = SpatialQueryFilter {
+        mask: LayerMask(u32::MAX),
+        excluded_entities: EntityHashSet::new(),
+    };
+
+    filter.excluded_entities.insert(attacker);
+
+    loop {
+        // Выпускаем виртуальный прямоугольник. Пересечение с ним означает потенциальное попадание.
+        let maybe_hit = spatial_q.cast_shape(
+            &Collider::rectangle(MAX_X_DISTANCE, MAX_Y_DISTANCE),
+            origin,
+            0.0,
+            (*direction).into(),
+            &ShapeCastConfig {
+                max_distance: MAX_X_DISTANCE,
+                target_distance: 0.0,
+                compute_contact_on_penetration: true,
+                ignore_origin_penetration: true,
+            },
+            &filter,
+        );
+
+        let Some(hit_data) = maybe_hit else {
+            break; // Если попаданий больше нет, поиск закончен
+        };
+
+        // В следующий раз исключаем из поиска сущность, в которую попали, чтобы найти следующую
+        filter.excluded_entities.insert(hit_data.entity);
+
+        let Ok(components) = hit_entity_q.get(hit_data.entity) else {
+            continue;
+        };
+
+        if components.3 {
+            continue; // В пол не стреляем
+        }
+
+        hits.push(HitEntityBundle {
+            hit_data,
+            global_transform: components.0.clone(),
+            layer: components.1.clone(),
+            is_character: components.2,
+        });
+    }
+
+    // В `hits` достижимые сущности в порядке близости. Выбираем, в кого из них стрелять.
+    hits.sort_by_key(|h| -(h.is_character as isize)); // Персонажи приоритетнее объектов
+
+    for hit in &hits {
+        if !is_obstructed(origin_layer, &hit.layer, hit.hit_data.point1, spatial_q) {
+            return Some(hit.clone());
+        }
+    }
+
+    None
+}
+
+/// Определяет нет ли препятствия между слоями для заданной точки
+fn is_obstructed(src: &Layer, dst: &Layer, point: Vec2, spatial_q: &SpatialQuery) -> bool {
+    let src_id = src.id();
+    let dst_id = dst.id();
+
+    let (low, high) = match dst_id.cmp(&src_id) {
+        Ordering::Equal => return false, // Тот же слой => ничего не может влезть
+        Ordering::Greater => (src_id, dst_id),
+        Ordering::Less => (dst_id, src_id),
+    };
+
+    let depth = high.saturating_sub(low).saturating_sub(1);
+
+    if depth == 0 {
+        return false; // Соседние слои => между ними ничего не может влезть
+    }
+
+    let layer_mask = ((1 << depth) - 1) << (low + 1); // (3, 6) => 0b110000
+
+    let filter = SpatialQueryFilter {
+        mask: LayerMask(layer_mask),
+        ..Default::default()
+    };
+
+    spatial_q.project_point(point, true, &filter).is_some()
+}
+
+#[derive(Component)]
+struct Hit {
+    timer: Timer,
+}
+
+impl Default for Hit {
+    fn default() -> Self {
+        Self {
+            timer: Timer::from_seconds(HIT_LIFETIME.as_secs_f32(), TimerMode::Once),
+        }
+    }
+}
+
+/// Обработка попадания
+fn take_hit(hit_entity_bundle: &HitEntityBundle, commands: &mut Commands) {
+    let hit = commands
+        .spawn((
+            Name::new("Hit"),
+            Sprite::from_color(Color::srgb(1.0, 0.0, 0.0), Vec2::new(20.0, 20.0)),
+            Transform::from_translation(Vec3::new(
+                0.0,
+                0.0,
+                hit_entity_bundle.global_transform.translation().z + 1.0,
+            )),
+            Hit::default(),
+        ))
+        .id();
+
+    commands
+        .entity(hit_entity_bundle.hit_data.entity)
+        .add_child(hit);
+}
+
+fn tick_hit_timer(time: Res<Time>, q: Query<(Entity, &mut Hit)>, mut commands: Commands) {
+    for (entity, mut hit) in q {
+        hit.timer.tick(time.delta());
+
+        if hit.timer.is_finished() {
+            commands.entity(entity).despawn();
         }
     }
 }

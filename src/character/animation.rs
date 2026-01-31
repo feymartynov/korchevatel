@@ -4,8 +4,9 @@ use avian2d::prelude::*;
 use bevy::platform::collections::HashMap;
 use bevy::prelude::*;
 
-use crate::character::Attack;
 use crate::movement::Direction;
+
+use super::AttackInput;
 
 const DELTA_X: f32 = 10.0;
 
@@ -27,12 +28,12 @@ fn update_animation_movement(
     mut q: Query<(
         &LinearVelocity,
         &Direction,
-        Option<&Attack>,
+        &AttackInput,
         &mut Sprite,
         &mut Animation,
     )>,
 ) {
-    for (linear_velocity, direction, maybe_attack, mut sprite, mut animation) in &mut q {
+    for (linear_velocity, direction, attack_input, mut sprite, mut animation) in &mut q {
         let dx = linear_velocity.x;
 
         // Разворот в зависимости от направления взгляда
@@ -48,11 +49,7 @@ fn update_animation_movement(
         };
 
         // Атакует или нет
-        let is_attacking = maybe_attack
-            .map(|attack| attack.is_attacking())
-            .unwrap_or_default();
-
-        let attack_mode = if is_attacking {
+        let attack_mode = if attack_input.is_attacking() {
             AttackMode::Firing
         } else {
             AttackMode::None
