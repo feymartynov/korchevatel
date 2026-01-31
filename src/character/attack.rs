@@ -5,6 +5,7 @@ use avian2d::math::*;
 use avian2d::prelude::*;
 use bevy::ecs::entity::EntityHashSet;
 use bevy::prelude::*;
+use bevy::sprite::Anchor;
 
 use crate::character::Character;
 use crate::level::Layer;
@@ -81,7 +82,14 @@ fn tick_attack_timer(time: Res<Time>, q: Query<&mut Attack>) {
     }
 }
 
-type HitEntityComponents<'a> = (&'a GlobalTransform, &'a Layer, Has<Character>, Has<Ground>);
+type HitEntityComponents<'a> = (
+    &'a Transform,
+    &'a Layer,
+    &'a Anchor,
+    &'a Collider,
+    Has<Character>,
+    Has<Ground>,
+);
 
 /// Стейт-машина атаки
 fn attack(
@@ -156,8 +164,10 @@ fn attack(
 #[derive(Clone, Debug)]
 struct HitEntityBundle {
     hit_data: ShapeHitData,
-    global_transform: GlobalTransform,
+    transform: Transform,
     layer: Layer,
+    anchor: Anchor,
+    collider: Collider,
     is_character: bool,
 }
 
@@ -207,15 +217,17 @@ fn shoot(
             continue;
         };
 
-        if components.3 {
+        if components.5 {
             continue; // В пол не стреляем
         }
 
         hits.push(HitEntityBundle {
             hit_data,
-            global_transform: components.0.clone(),
+            transform: components.0.clone(),
             layer: components.1.clone(),
-            is_character: components.2,
+            anchor: components.2.clone(),
+            collider: components.3.clone(),
+            is_character: components.4,
         });
     }
 
@@ -223,7 +235,7 @@ fn shoot(
     hits.sort_by_key(|h| -(h.is_character as isize)); // Персонажи приоритетнее объектов
 
     for hit in &hits {
-        if !is_obstructed(origin_layer, &hit.layer, hit.hit_data.point1, spatial_q) {
+        if !is_obstructed(origin_layer, &hit.layer, *hit.anchor, spatial_q) {
             return Some(hit.clone());
         }
     }
@@ -278,9 +290,6 @@ fn take_hit(
     asset_server: &Res<AssetServer>,
     texture_atlas_layouts: &mut ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    let local_point = hit_entity_bundle.hit_data.point1
-        - hit_entity_bundle.global_transform.translation().truncate();
-
     let layout = TextureAtlasLayout::from_grid(HIT_SIZE, HIT_FRAMES, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
 
@@ -296,9 +305,16 @@ fn take_hit(
                 ..Default::default()
             },
             Transform::from_translation(Vec3::new(
-                local_point.x,
-                local_point.y,
-                hit_entity_bundle.global_transform.translation().z,
+                hit_entity_bundle.anchor.x,
+                hit_entity_bundle.anchor.y
+                    + hit_entity_bundle
+                        .collider
+                        .shape()
+                        .as_capsule()
+                        .unwrap()
+                        .height()
+                        * 0.4,
+                hit_entity_bundle.transform.translation.z,
             )),
             Hit::default(),
         ))
