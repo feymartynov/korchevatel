@@ -214,8 +214,8 @@ fn shoot(
 
         hits.push(HitEntityBundle {
             hit_data,
-            transform: components.0.clone(),
-            layer: components.1.clone(),
+            transform: *components.0,
+            layer: *components.1,
             hit_point: **components.2,
             is_character: components.3,
         });

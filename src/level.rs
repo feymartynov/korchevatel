@@ -36,6 +36,7 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         )
         .observe(
             |object_created: On<TiledEvent<ObjectCreated>>, mut commands: Commands| {
+                // Помещаем объект на слой
                 if let Some(id) = object_created.event().get_layer_id() {
                     commands
                         .entity(object_created.event().origin)
@@ -45,8 +46,10 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         )
         .observe(
             |collider_created: On<TiledEvent<ColliderCreated>>,
-             mut collision_layers_q: Query<&mut CollisionLayers>,
+             mut q: Query<(&mut CollisionLayers, Option<&TiledColliderOf>)>,
+             parent_q: Query<&TiledObject>,
              mut commands: Commands| {
+                // Коллайдер создаётся отдельно дочкой. Помещаем на слой и применяем физику
                 let Some(layer_id) = collider_created.event().get_layer_id() else {
                     return;
                 };
@@ -55,12 +58,29 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     .entity(collider_created.event().origin)
                     .insert((RigidBody::Static, Layer::new(layer_id)));
 
-                if let Ok(mut collision_layers) =
-                    collision_layers_q.get_mut(collider_created.event().origin)
+                let Ok((mut collision_layers, maybe_tiled_collider_of)) =
+                    q.get_mut(collider_created.event().origin)
+                else {
+                    return;
+                };
+
+                let layer_mask = Layer::new(layer_id).into();
+                collision_layers.memberships = layer_mask;
+                collision_layers.filters = layer_mask;
+
+                // Центр массы ошибочно считается как левый нижний угол. Ставим на центр объекта
+                if let Some(tiled_collider_of) = maybe_tiled_collider_of
+                    && let Ok(
+                        TiledObject::Tile { width, height }
+                        | TiledObject::Rectangle { width, height }
+                        | TiledObject::Ellipse { width, height },
+                    ) = parent_q.get(tiled_collider_of.entity())
                 {
-                    let layer_mask = Layer::new(layer_id).into();
-                    collision_layers.memberships = layer_mask;
-                    collision_layers.filters = layer_mask;
+                    let center = Vec2::new(width / 2.0, height / 2.0);
+
+                    commands
+                        .entity(collider_created.event().origin)
+                        .insert((CenterOfMass(center), NoAutoCenterOfMass));
                 }
             },
         );
