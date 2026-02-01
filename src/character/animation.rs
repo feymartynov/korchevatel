@@ -3,6 +3,7 @@ use std::time::Duration;
 use avian2d::prelude::*;
 use bevy::platform::collections::HashMap;
 use bevy::prelude::*;
+use bevy::sprite::Anchor;
 
 use crate::movement::Direction;
 
@@ -30,19 +31,24 @@ fn update_animation_movement(
         &Direction,
         &AttackInput,
         &mut Sprite,
+        &mut Anchor,
         &mut Animation,
     )>,
 ) {
-    for (linear_velocity, direction, attack_input, mut sprite, mut animation) in &mut q {
-        let dx = linear_velocity.x;
-
+    for (linear_velocity, direction, attack_input, mut sprite, mut anchor, mut animation) in &mut q
+    {
         // Разворот в зависимости от направления взгляда
-        if dx.abs() > DELTA_X {
+        if linear_velocity.x.abs() > DELTA_X {
+            let was_flip_x = sprite.flip_x;
             sprite.flip_x = matches!(direction, Direction::Left);
+
+            if sprite.flip_x != was_flip_x {
+                anchor.x *= -1.0;
+            }
         }
 
         // Стоит или идёт в зависимости от скорости
-        let movement_mode = if ops::abs(dx) >= DELTA_X {
+        let movement_mode = if ops::abs(linear_velocity.x) >= DELTA_X {
             MovementMode::Walking
         } else {
             MovementMode::Idle
