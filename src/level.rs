@@ -47,13 +47,16 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
             |collider_created: On<TiledEvent<ColliderCreated>>,
              mut collision_layers_q: Query<&mut CollisionLayers>,
              mut commands: Commands| {
+                let Some(layer_id) = collider_created.event().get_layer_id() else {
+                    return;
+                };
+
                 commands
                     .entity(collider_created.event().origin)
-                    .insert(RigidBody::Static);
+                    .insert((RigidBody::Static, Layer::new(layer_id)));
 
-                if let Some(layer_id) = collider_created.event().get_layer_id()
-                    && let Ok(mut collision_layers) =
-                        collision_layers_q.get_mut(collider_created.event().origin)
+                if let Ok(mut collision_layers) =
+                    collision_layers_q.get_mut(collider_created.event().origin)
                 {
                     let layer_mask = Layer::new(layer_id).into();
                     collision_layers.memberships = layer_mask;
@@ -79,7 +82,7 @@ impl Layer {
     }
 
     pub fn id(self) -> u32 {
-        self.mask >> 1
+        self.mask.trailing_zeros()
     }
 
     pub fn next(self) -> Self {

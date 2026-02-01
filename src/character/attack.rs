@@ -5,12 +5,10 @@ use avian2d::math::*;
 use avian2d::prelude::*;
 use bevy::ecs::entity::EntityHashSet;
 use bevy::prelude::*;
-use bevy::sprite::Anchor;
 
 use crate::character::Character;
 use crate::level::Layer;
 use crate::movement::Direction;
-use crate::movement::Ground;
 
 /// Время прицеливания и выстрела
 const ATTACK_TIME: Duration = Duration::from_millis(100);
@@ -85,10 +83,8 @@ fn tick_attack_timer(time: Res<Time>, q: Query<&mut Attack>) {
 type HitEntityComponents<'a> = (
     &'a Transform,
     &'a Layer,
-    &'a Anchor,
-    &'a Collider,
+    &'a ComputedCenterOfMass,
     Has<Character>,
-    Has<Ground>,
 );
 
 /// Стейт-машина атаки
@@ -166,8 +162,7 @@ struct HitEntityBundle {
     hit_data: ShapeHitData,
     transform: Transform,
     layer: Layer,
-    anchor: Anchor,
-    collider: Collider,
+    hit_point: Vec2,
     is_character: bool,
 }
 
@@ -200,7 +195,7 @@ fn shoot(
             &ShapeCastConfig {
                 max_distance: MAX_X_DISTANCE,
                 target_distance: 0.0,
-                compute_contact_on_penetration: true,
+                compute_contact_on_penetration: false,
                 ignore_origin_penetration: true,
             },
             &filter,
@@ -217,17 +212,12 @@ fn shoot(
             continue;
         };
 
-        if components.5 {
-            continue; // В пол не стреляем
-        }
-
         hits.push(HitEntityBundle {
             hit_data,
             transform: components.0.clone(),
             layer: components.1.clone(),
-            anchor: components.2.clone(),
-            collider: components.3.clone(),
-            is_character: components.4,
+            hit_point: **components.2,
+            is_character: components.3,
         });
     }
 
@@ -235,7 +225,7 @@ fn shoot(
     hits.sort_by_key(|h| -(h.is_character as isize)); // Персонажи приоритетнее объектов
 
     for hit in &hits {
-        if !is_obstructed(origin_layer, &hit.layer, *hit.anchor, spatial_q) {
+        if !is_obstructed(origin_layer, &hit.layer, hit.hit_point, spatial_q) {
             return Some(hit.clone());
         }
     }
@@ -305,15 +295,8 @@ fn take_hit(
                 ..Default::default()
             },
             Transform::from_translation(Vec3::new(
-                hit_entity_bundle.anchor.x,
-                hit_entity_bundle.anchor.y
-                    + hit_entity_bundle
-                        .collider
-                        .shape()
-                        .as_capsule()
-                        .unwrap()
-                        .height()
-                        * 0.4,
+                hit_entity_bundle.hit_point.x,
+                hit_entity_bundle.hit_point.y,
                 hit_entity_bundle.transform.translation.z,
             )),
             Hit::default(),
