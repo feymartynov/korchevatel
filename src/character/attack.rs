@@ -5,6 +5,7 @@ use avian2d::math::*;
 use avian2d::prelude::*;
 use bevy::ecs::entity::EntityHashSet;
 use bevy::prelude::*;
+use rand::distr::{Distribution, StandardUniform};
 
 use crate::character::Character;
 use crate::level::Layer;
@@ -26,6 +27,8 @@ const HIT_SPRITE_SHEET_PATH: &str = "images/blood_hit.png";
 const HIT_SIZE: UVec2 = UVec2::new(30, 30);
 /// Кол-во кадров анимации попадания
 const HIT_FRAMES: u32 = 3;
+/// Среднеквадратичное отклонение от цели попадания
+const HIT_SIGMA: f32 = 30.0;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(FixedUpdate, attack);
@@ -216,7 +219,7 @@ fn shoot(
             hit_data,
             transform: *components.0,
             layer: *components.1,
-            hit_point: **components.2,
+            hit_point: shift_hit_point(**components.2, HIT_SIGMA),
             is_character: components.3,
         });
     }
@@ -258,6 +261,19 @@ fn is_obstructed(src: &Layer, dst: &Layer, point: Vec2, spatial_q: &SpatialQuery
     };
 
     spatial_q.project_point(point, true, &filter).is_some()
+}
+
+/// Добавляет случайную погрешность к стрельбе
+fn shift_hit_point(center: Vec2, sigma: f32) -> Vec2 {
+    Vec2::new(center.x + rand_delta(sigma), center.y + rand_delta(sigma))
+}
+
+#[inline]
+fn rand_delta(sigma: f32) -> f32 {
+    let mut rng = rand::rng();
+    let distr = StandardUniform;
+    let random = <StandardUniform as Distribution<f32>>::sample(&distr, &mut rng);
+    (random - 0.5) * 2.0 * sigma
 }
 
 #[derive(Component)]
