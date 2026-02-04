@@ -8,6 +8,7 @@ use bevy::prelude::*;
 use rand::distr::{Distribution, StandardUniform};
 
 use crate::character::Character;
+use crate::hit::HitMessage;
 use crate::level::Layer;
 use crate::movement::Direction;
 
@@ -19,26 +20,12 @@ const COOLDOWN_TIME: Duration = Duration::from_millis(100);
 const MAX_X_DISTANCE: Scalar = 500.0;
 /// Высота стрельбы
 const MAX_Y_DISTANCE: Scalar = 100.0;
-/// Время анимации попадания
-const HIT_LIFETIME: Duration = Duration::from_millis(300);
-/// Путь до спрайтов с анимацией попадания
-const HIT_SPRITE_SHEET_PATH: &str = "images/blood_hit.png";
-/// Размер спрайта попадания
-const HIT_SIZE: UVec2 = UVec2::new(30, 30);
-/// Кол-во кадров анимации попадания
-const HIT_FRAMES: u32 = 3;
 /// Среднеквадратичное отклонение от цели попадания
-const HIT_SIGMA: f32 = 30.0;
+const PRECISION_SIGMA: f32 = 30.0;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(FixedUpdate, attack);
-    app.add_systems(
-        Update,
-        (
-            tick_attack_timer.before(attack),
-            tick_hit_timer.after(attack),
-        ),
-    );
+    app.add_systems(Update, tick_attack_timer.before(attack));
 }
 
 #[derive(Component, Default)]
@@ -102,9 +89,7 @@ fn attack(
     )>,
     spatial_q: SpatialQuery,
     hit_entity_q: Query<HitEntityComponents>,
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    mut hit_message_writer: MessageWriter<HitMessage>,
 ) {
     for (attacker, mut attack, attack_input, direction, global_transform, layer) in q {
         match &attack.state {
@@ -136,12 +121,7 @@ fn attack(
                 if let Some(hit) =
                     shoot(attacker, origin, layer, direction, &spatial_q, hit_entity_q)
                 {
-                    take_hit(
-                        &hit,
-                        &mut commands,
-                        &asset_server,
-                        &mut texture_atlas_layouts,
-                    );
+                    hit_message_writer.write(hit);
                 }
 
                 // Пауза перед следующей атакой
@@ -160,15 +140,6 @@ fn attack(
     }
 }
 
-#[derive(Clone, Debug)]
-struct HitEntityBundle {
-    hit_data: ShapeHitData,
-    transform: Transform,
-    layer: Layer,
-    hit_point: Vec2,
-    is_character: bool,
-}
-
 /// Стрельба
 fn shoot(
     attacker: Entity,
@@ -177,7 +148,7 @@ fn shoot(
     direction: &Direction,
     spatial_q: &SpatialQuery,
     hit_entity_q: Query<HitEntityComponents>,
-) -> Option<HitEntityBundle> {
+) -> Option<HitMessage> {
     // Находим все сущности на всех слоях, в которые можно попасть
     let mut hits = Vec::new();
 
@@ -215,11 +186,11 @@ fn shoot(
             continue;
         };
 
-        hits.push(HitEntityBundle {
+        hits.push(HitMessage {
             hit_data,
             transform: *components.0,
             layer: *components.1,
-            hit_point: shift_hit_point(**components.2, HIT_SIGMA),
+            hit_point: shift_hit_point(**components.2, PRECISION_SIGMA),
             is_character: components.3,
         });
     }
@@ -274,72 +245,4 @@ fn rand_delta(sigma: f32) -> f32 {
     let distr = StandardUniform;
     let random = <StandardUniform as Distribution<f32>>::sample(&distr, &mut rng);
     (random - 0.5) * 2.0 * sigma
-}
-
-#[derive(Component)]
-struct Hit {
-    timer: Timer,
-}
-
-impl Default for Hit {
-    fn default() -> Self {
-        Self {
-            timer: Timer::from_seconds(HIT_LIFETIME.as_secs_f32(), TimerMode::Once),
-        }
-    }
-}
-
-/// Обработка попадания
-fn take_hit(
-    hit_entity_bundle: &HitEntityBundle,
-    commands: &mut Commands,
-    asset_server: &Res<AssetServer>,
-    texture_atlas_layouts: &mut ResMut<Assets<TextureAtlasLayout>>,
-) {
-    let layout = TextureAtlasLayout::from_grid(HIT_SIZE, HIT_FRAMES, 1, None, None);
-    let texture_atlas_layout = texture_atlas_layouts.add(layout);
-
-    let hit = commands
-        .spawn((
-            Name::new("Hit"),
-            Sprite {
-                image: asset_server.load(HIT_SPRITE_SHEET_PATH),
-                texture_atlas: Some(TextureAtlas {
-                    layout: texture_atlas_layout,
-                    index: 0,
-                }),
-                ..Default::default()
-            },
-            Transform::from_translation(Vec3::new(
-                hit_entity_bundle.hit_point.x,
-                hit_entity_bundle.hit_point.y,
-                hit_entity_bundle.transform.translation.z,
-            )),
-            Hit::default(),
-        ))
-        .id();
-
-    commands
-        .entity(hit_entity_bundle.hit_data.entity)
-        .add_child(hit);
-}
-
-fn tick_hit_timer(
-    time: Res<Time>,
-    q: Query<(Entity, &mut Hit, &mut Sprite)>,
-    mut commands: Commands,
-) {
-    for (entity, mut hit, mut sprite) in q {
-        hit.timer.tick(time.delta());
-
-        if hit.timer.is_finished() {
-            commands.entity(entity).despawn();
-        }
-
-        // Анимация попадания
-        if let Some(atlas) = sprite.texture_atlas.as_mut() {
-            let elapsed_rate = hit.timer.elapsed().as_secs_f64() / HIT_LIFETIME.as_secs_f64();
-            atlas.index = (HIT_FRAMES as f64 * elapsed_rate) as usize;
-        }
-    }
 }

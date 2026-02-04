@@ -4,6 +4,8 @@ use avian2d::prelude::*;
 use bevy::prelude::*;
 use bevy_ecs_tiled::prelude::*;
 
+use crate::object::Object;
+
 pub use self::location::Boundary as LocationBoundary;
 
 pub(super) fn plugin(app: &mut App) {
@@ -56,7 +58,7 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
                 commands
                     .entity(collider_created.event().origin)
-                    .insert((RigidBody::Static, Layer::new(layer_id)));
+                    .insert((RigidBody::Static, Layer::new(layer_id), Object));
 
                 let Ok((mut collision_layers, maybe_tiled_collider_of)) =
                     q.get_mut(collider_created.event().origin)

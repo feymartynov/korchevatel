@@ -9,9 +9,11 @@ mod camera;
 mod character;
 #[cfg(debug_assertions)]
 mod debug;
+mod hit;
 mod level;
 mod mob;
 mod movement;
+mod object;
 mod player;
 
 use std::env;
@@ -53,6 +55,8 @@ fn main() -> Result<()> {
         player::plugin,
         movement::plugin,
         mob::plugin,
+        object::plugin,
+        hit::plugin,
     ));
 
     let mut path = env::current_dir().expect("current dir");

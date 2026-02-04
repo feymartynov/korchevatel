@@ -1,6 +1,6 @@
 [
   {
-    "id": 31,
+    "id": 32,
     "name": "bevy_math::rects::rect::Rect",
     "type": "class",
     "useAs": [
@@ -30,7 +30,7 @@
     ]
   },
   {
-    "id": 26,
+    "id": 27,
     "name": "bevy_time::timer::TimerMode",
     "type": "class",
     "useAs": [
@@ -48,7 +48,7 @@
     ]
   },
   {
-    "id": 25,
+    "id": 26,
     "name": "bevy_time::timer::TimerMode:::Variant",
     "type": "enum",
     "storageType": "string",
@@ -59,7 +59,7 @@
     "valuesAsFlags": false
   },
   {
-    "id": 21,
+    "id": 22,
     "name": "core::option::Option<bevy_ecs::entity::Entity>",
     "type": "class",
     "useAs": [
@@ -83,7 +83,7 @@
     ]
   },
   {
-    "id": 19,
+    "id": 20,
     "name": "core::option::Option<bevy_ecs::entity::Entity>:::Variant",
     "type": "enum",
     "storageType": "string",
@@ -94,7 +94,7 @@
     "valuesAsFlags": false
   },
   {
-    "id": 20,
+    "id": 21,
     "name": "core::option::Option<bevy_ecs::entity::Entity>::Some",
     "type": "class",
     "useAs": [
@@ -111,7 +111,7 @@
     ]
   },
   {
-    "id": 18,
+    "id": 19,
     "name": "glam::Vec2",
     "type": "class",
     "useAs": [
@@ -213,7 +213,7 @@
     ]
   },
   {
-    "id": 23,
+    "id": 24,
     "name": "korchevatel::character::animation::AnimationState",
     "type": "class",
     "useAs": [
@@ -237,7 +237,7 @@
     ]
   },
   {
-    "id": 30,
+    "id": 31,
     "name": "korchevatel::character::animation::AttackMode",
     "type": "class",
     "useAs": [
@@ -255,7 +255,7 @@
     ]
   },
   {
-    "id": 29,
+    "id": 30,
     "name": "korchevatel::character::animation::AttackMode:::Variant",
     "type": "enum",
     "storageType": "string",
@@ -266,7 +266,7 @@
     "valuesAsFlags": false
   },
   {
-    "id": 28,
+    "id": 29,
     "name": "korchevatel::character::animation::MovementMode",
     "type": "class",
     "useAs": [
@@ -284,7 +284,7 @@
     ]
   },
   {
-    "id": 27,
+    "id": 28,
     "name": "korchevatel::character::animation::MovementMode:::Variant",
     "type": "enum",
     "storageType": "string",
@@ -510,7 +510,7 @@
   },
   {
     "id": 16,
-    "name": "korchevatel::player::Player",
+    "name": "korchevatel::object::Object",
     "type": "class",
     "useAs": [
       "property"
@@ -521,6 +521,17 @@
   },
   {
     "id": 17,
+    "name": "korchevatel::player::Player",
+    "type": "class",
+    "useAs": [
+      "property"
+    ],
+    "color": "#000000",
+    "drawFill": true,
+    "members": []
+  },
+  {
+    "id": 18,
     "name": "korchevatel::player::PlayerSpawnPoint",
     "type": "class",
     "useAs": [

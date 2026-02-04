@@ -1,5 +1,6 @@
 mod animation;
 mod attack;
+mod hit;
 mod registry;
 
 use std::time::Duration;
@@ -17,7 +18,7 @@ pub use self::animation::{Animation, AnimationState};
 pub use self::registry::Registry;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_plugins((animation::plugin, attack::plugin));
+    app.add_plugins((animation::plugin, attack::plugin, hit::plugin));
     app.add_observer(on_insert);
 }
 
