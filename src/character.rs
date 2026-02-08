@@ -31,6 +31,8 @@ pub struct Character {
     collider_radius: f32,
     collider_length: f32,
     animations: Vec<AnimationConfig>,
+    #[serde(default)]
+    shooting_origin_offset: Vec2,
 }
 
 impl Character {

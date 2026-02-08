@@ -4,7 +4,7 @@
  <tile id="0">
   <image source="images/car_bmw.png" width="665" height="205"/>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="250.19" y="17.3004">
+   <object id="1" x="247.19" y="-1.6996">
     <polygon points="0,0 262.167,6.65399 403.232,75.8555 411.217,206.274 -242.205,202.281 -239.544,89.1635 -103.802,58.5551"/>
    </object>
   </objectgroup>

@@ -61,7 +61,7 @@ fn take_hit(
                 Transform::from_translation(Vec3::new(
                     message.hit_point.x,
                     message.hit_point.y,
-                    message.transform.translation.z,
+                    message.global_transform.translation().z,
                 )),
                 Hit::default(),
             ))

@@ -7,9 +7,10 @@
       "columns": 15,
       "rows": 1
     },
-    "anchor": [ -0.12, 0.0 ],
-    "collider_radius": 40,
-    "collider_length": 150,
+    "anchor": [ -0.17, 0.0 ],
+    "shooting_origin_offset": [ 130.0, -95.0 ],
+    "collider_radius": 30,
+    "collider_length": 180,
     "animations": [
       {
         "movement_mode": "idle",
@@ -47,8 +48,8 @@
       "rows": 1
     },
     "anchor": [ -0.05, 0.0 ],
-    "collider_radius": 45,
-    "collider_length": 150,
+    "collider_radius": 35,
+    "collider_length": 180,
     "animations": [
       {
         "movement_mode": "idle",

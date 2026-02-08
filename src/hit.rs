@@ -10,8 +10,9 @@ pub(super) fn plugin(app: &mut App) {
 #[derive(Message, Clone, Debug)]
 pub struct HitMessage {
     pub hit_data: ShapeHitData,
-    pub transform: Transform,
+    pub global_transform: GlobalTransform,
     pub layer: Layer,
+    pub origin: Vec2,
     pub hit_point: Vec2,
     pub is_character: bool,
 }
