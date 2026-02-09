@@ -1,3 +1,5 @@
+mod ai;
+
 use bevy::prelude::*;
 
 use crate::character::Registry as CharacterRegistry;
@@ -7,6 +9,7 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<Mob>();
     app.register_type::<MobSpawnPoint>();
     app.add_systems(FixedUpdate, spawn);
+    app.add_plugins(ai::plugin);
 }
 
 /// Неигровой персонаж

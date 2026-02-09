@@ -107,7 +107,7 @@ impl MovementBundle {
 }
 
 /// Текущее действие движения
-#[derive(Component, Default, Reflect)]
+#[derive(Component, Debug, Default, Reflect)]
 #[reflect(Component)]
 pub struct MovementInput {
     pub x_direction: Scalar,

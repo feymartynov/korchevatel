@@ -10,11 +10,11 @@
     <property name="Ground" type="class" propertytype="korchevatel::movement::Ground"/>
    </properties>
   </object>
-  <object id="22" name="Hobo with a shotgun" x="1513.15" y="809.532">
+  <object id="1" name="Player spawn point" x="775.935" y="782.708">
    <properties>
-    <property name="MobSpawnPoint" type="class" propertytype="korchevatel::mob::MobSpawnPoint">
+    <property name="PlayerSpawnPoint" type="class" propertytype="korchevatel::player::PlayerSpawnPoint">
      <properties>
-      <property name="character" value="Hobo with a shotgun"/>
+      <property name="character" value="Nikita"/>
      </properties>
     </property>
    </properties>
@@ -37,21 +37,11 @@
     <property name="Ground" type="class" propertytype="korchevatel::movement::Ground"/>
    </properties>
   </object>
-  <object id="20" name="Hobo with a shotgun" x="1950.57" y="814.362">
+  <object id="20" name="Hobo with a shotgun" x="1291.3" y="812.73">
    <properties>
     <property name="MobSpawnPoint" type="class" propertytype="korchevatel::mob::MobSpawnPoint">
      <properties>
       <property name="character" value="Hobo with a shotgun"/>
-     </properties>
-    </property>
-   </properties>
-   <point/>
-  </object>
-  <object id="1" name="Player spawn point" x="999.499" y="802.29">
-   <properties>
-    <property name="PlayerSpawnPoint" type="class" propertytype="korchevatel::player::PlayerSpawnPoint">
-     <properties>
-      <property name="character" value="Nikita"/>
      </properties>
     </property>
    </properties>
