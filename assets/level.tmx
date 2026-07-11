@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="23">
+<map version="1.10" tiledversion="1.12.1" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="23">
  <tileset firstgid="1" source="cars.tsx"/>
  <imagelayer id="2" name="Background" locked="1">
   <image source="images/street.png" width="3072" height="1024"/>
@@ -9,16 +9,6 @@
    <properties>
     <property name="Ground" type="class" propertytype="korchevatel::movement::Ground"/>
    </properties>
-  </object>
-  <object id="1" name="Player spawn point" x="775.935" y="782.708">
-   <properties>
-    <property name="PlayerSpawnPoint" type="class" propertytype="korchevatel::player::PlayerSpawnPoint">
-     <properties>
-      <property name="character" value="Nikita"/>
-     </properties>
-    </property>
-   </properties>
-   <point/>
   </object>
  </objectgroup>
  <objectgroup id="4" name="Layer 2" parallaxx="1.05">
@@ -37,7 +27,17 @@
     <property name="Ground" type="class" propertytype="korchevatel::movement::Ground"/>
    </properties>
   </object>
-  <object id="20" name="Hobo with a shotgun" x="1291.3" y="812.73">
+  <object id="1" name="Player spawn point" x="2260.92" y="830.032">
+   <properties>
+    <property name="PlayerSpawnPoint" type="class" propertytype="korchevatel::player::PlayerSpawnPoint">
+     <properties>
+      <property name="character" value="Nikita"/>
+     </properties>
+    </property>
+   </properties>
+   <point/>
+  </object>
+  <object id="20" name="Hobo with a shotgun" x="1811.87" y="814.362">
    <properties>
     <property name="MobSpawnPoint" type="class" propertytype="korchevatel::mob::MobSpawnPoint">
      <properties>

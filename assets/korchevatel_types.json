@@ -322,9 +322,14 @@
     "drawFill": true,
     "members": [
       {
-        "name": "0",
+        "name": "rect",
         "propertyType": "bevy_math::rects::rect::Rect",
         "type": "class",
+        "value": null
+      },
+      {
+        "name": "layers",
+        "type": "int",
         "value": null
       }
     ]
@@ -358,7 +363,7 @@
     ]
   },
   {
-    "id": 9,
+    "id": 8,
     "name": "korchevatel::mob::ai::Target",
     "type": "class",
     "useAs": [

@@ -14,19 +14,30 @@ pub(super) fn plugin(app: &mut App) {
 #[derive(Component, Default, Reflect)]
 #[require(TiledObject)]
 #[reflect(Component)]
-pub struct Boundary(Rect);
+pub struct Boundary {
+    rect: Rect,
+    layers: usize,
+}
 
 impl Boundary {
     pub fn to_rect(&self) -> Rect {
-        self.0
+        self.rect
+    }
+
+    pub fn layers(&self) -> usize {
+        self.layers
     }
 }
 
 fn compute_boundaries(
-    q: Query<(Entity, &TiledImage, &Transform), Or<(Added<TiledImage>, Changed<Transform>)>>,
+    q: Query<
+        (Entity, &TiledImage, &Transform, &TiledMapReference),
+        Or<(Added<TiledImage>, Changed<Transform>)>,
+    >,
+    layers_q: Query<&ChildOf, With<TiledLayer>>,
     mut commands: Commands,
 ) {
-    for (entity, tiled_image, transform) in q {
+    for (entity, tiled_image, transform, tiled_map_reference) in q {
         let top_left = transform.translation.truncate();
         let right_bottom = top_left + Vec2::new(tiled_image.base_size.x, -tiled_image.base_size.y);
         let rect = Rect::from_corners(top_left, right_bottom);
@@ -65,8 +76,13 @@ fn compute_boundaries(
             (right_wall, 0.0, h_wall),
         ]);
 
+        let layers = layers_q
+            .iter()
+            .filter(|child_of| child_of.parent() == tiled_map_reference.entity())
+            .count();
+
         commands
             .entity(entity)
-            .insert((Boundary(rect), RigidBody::Static, collider));
+            .insert((Boundary { rect, layers }, RigidBody::Static, collider));
     }
 }

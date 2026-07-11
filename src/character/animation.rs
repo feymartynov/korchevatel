@@ -34,7 +34,12 @@ fn update_animation_movement(
         &mut Anchor,
         &mut Animation,
     )>,
+    physics_time: Res<Time<Physics>>,
 ) {
+    if physics_time.is_paused() {
+        return;
+    }
+
     for (linear_velocity, direction, attack_input, mut sprite, mut anchor, mut animation) in &mut q
     {
         // Разворот в зависимости от направления взгляда
@@ -70,14 +75,29 @@ fn update_animation_movement(
 }
 
 /// Тик времени анимации для смены кадров
-fn update_animation_timer(time: Res<Time>, mut query: Query<&mut Animation>) {
+fn update_animation_timer(
+    time: Res<Time>,
+    mut query: Query<&mut Animation>,
+    physics_time: Res<Time<Physics>>,
+) {
+    if physics_time.is_paused() {
+        return;
+    }
+
     for mut animation in &mut query {
         animation.update(time.delta());
     }
 }
 
 /// Смена набора спрайтов соответствующих текущему состоянию анимации
-fn update_animation_atlas(mut query: Query<(&Animation, &mut Sprite)>) {
+fn update_animation_atlas(
+    mut query: Query<(&Animation, &mut Sprite)>,
+    physics_time: Res<Time<Physics>>,
+) {
+    if physics_time.is_paused() {
+        return;
+    }
+
     for (animation, mut sprite) in &mut query {
         let Some(atlas) = sprite.texture_atlas.as_mut() else {
             continue;

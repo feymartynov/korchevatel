@@ -22,43 +22,58 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ))
         .observe(
             |layer_created: On<TiledEvent<LayerCreated>>,
-             mut q: Query<&mut Transform>,
+             mut q: Query<(&TiledName, &mut Transform)>,
              mut commands: Commands| {
-                if let Some(id) = layer_created.get_layer_id()
-                    && id > 0
-                {
-                    let entity = layer_created.event().origin;
-                    commands.entity(entity).insert(Layer::new(id));
+                let entity = layer_created.event().origin;
+                let Ok((name, mut transform)) = q.get_mut(entity) else {
+                    return;
+                };
 
-                    if let Ok(mut transform) = q.get_mut(entity) {
-                        transform.translation.z = id as f32;
-                    }
-                }
+                let Some(layer) = Layer::from_tiled_name(name) else {
+                    return;
+                };
+
+                commands.entity(entity).insert(layer);
+                transform.translation.z = layer.id() as f32;
             },
         )
         .observe(
-            |object_created: On<TiledEvent<ObjectCreated>>, mut commands: Commands| {
+            |object_created: On<TiledEvent<ObjectCreated>>,
+             layer_q: Query<&TiledName, With<TiledLayer>>,
+             mut commands: Commands| {
                 // Помещаем объект на слой
-                if let Some(id) = object_created.event().get_layer_id() {
-                    commands
-                        .entity(object_created.event().origin)
-                        .insert(Layer::new(id));
+                if let Some(layer_entity) = object_created.get_layer_entity()
+                    && let Ok(name) = layer_q.get(layer_entity)
+                    && let Some(layer) = Layer::from_tiled_name(name)
+                {
+                    commands.entity(object_created.event().origin).insert(layer);
                 }
             },
         )
         .observe(
             |collider_created: On<TiledEvent<ColliderCreated>>,
              mut q: Query<(&mut CollisionLayers, Option<&TiledColliderOf>)>,
+             layer_q: Query<&TiledName, With<TiledLayer>>,
              parent_q: Query<&TiledObject>,
              mut commands: Commands| {
                 // Коллайдер создаётся отдельно дочкой. Помещаем на слой и применяем физику
-                let Some(layer_id) = collider_created.event().get_layer_id() else {
+                let Some(layer_entity) = collider_created.get_layer_entity() else {
                     return;
                 };
 
-                commands
-                    .entity(collider_created.event().origin)
-                    .insert((RigidBody::Static, Layer::new(layer_id), Object));
+                let Ok(name) = layer_q.get(layer_entity) else {
+                    return;
+                };
+
+                let Some(layer) = Layer::from_tiled_name(name) else {
+                    return;
+                };
+
+                commands.entity(collider_created.event().origin).insert((
+                    RigidBody::Static,
+                    layer,
+                    Object,
+                ));
 
                 let Ok((mut collision_layers, maybe_tiled_collider_of)) =
                     q.get_mut(collider_created.event().origin)
@@ -66,7 +81,7 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     return;
                 };
 
-                let layer_mask = Layer::new(layer_id).into();
+                let layer_mask = layer.into();
                 collision_layers.memberships = layer_mask;
                 collision_layers.filters = layer_mask;
 
@@ -118,6 +133,13 @@ impl Layer {
             mask: self.mask.rotate_right(1),
         }
     }
+
+    fn from_tiled_name(name: &TiledName) -> Option<Self> {
+        name.0
+            .strip_prefix("Layer ")
+            .and_then(|id| id.parse::<u32>().ok())
+            .map(Self::new)
+    }
 }
 
 impl PhysicsLayer for Layer {
@@ -127,5 +149,35 @@ impl PhysicsLayer for Layer {
 
     fn all_bits() -> u32 {
         u32::MAX
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn layer_from_tiled_name_parses_gameplay_layers() {
+        assert_eq!(
+            Layer::from_tiled_name(&TiledName("Layer 1".to_string())).map(Layer::id),
+            Some(1)
+        );
+        assert_eq!(
+            Layer::from_tiled_name(&TiledName("Layer 2".to_string())).map(Layer::id),
+            Some(2)
+        );
+        assert_eq!(
+            Layer::from_tiled_name(&TiledName("Layer 3".to_string())).map(Layer::id),
+            Some(3)
+        );
+    }
+
+    #[test]
+    fn layer_from_tiled_name_ignores_non_gameplay_layers() {
+        assert!(Layer::from_tiled_name(&TiledName("Background".to_string())).is_none());
+        assert!(Layer::from_tiled_name(&TiledName("Objects".to_string())).is_none());
+        assert!(Layer::from_tiled_name(&TiledName("Layer x".to_string())).is_none());
     }
 }

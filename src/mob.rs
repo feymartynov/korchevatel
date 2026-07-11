@@ -1,4 +1,5 @@
 mod ai;
+mod nav_grid;
 
 use bevy::prelude::*;
 
@@ -9,7 +10,7 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<Mob>();
     app.register_type::<MobSpawnPoint>();
     app.add_systems(FixedUpdate, spawn);
-    app.add_plugins(ai::plugin);
+    app.add_plugins((ai::plugin, nav_grid::plugin));
 }
 
 /// Неигровой персонаж

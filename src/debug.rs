@@ -2,8 +2,8 @@ use avian2d::prelude::*;
 use bevy::diagnostic::FrameTimeDiagnosticsPlugin;
 use bevy::input::common_conditions::input_just_pressed;
 use bevy::prelude::*;
-// use bevy_inspector_egui::bevy_egui::EguiPlugin;
-// use bevy_inspector_egui::quick::{FilterQueryInspectorPlugin, WorldInspectorPlugin};
+use bevy_inspector_egui::bevy_egui::EguiPlugin;
+use bevy_inspector_egui::quick::{FilterQueryInspectorPlugin, WorldInspectorPlugin};
 
 pub struct DebugPlugin;
 
@@ -13,9 +13,9 @@ impl Plugin for DebugPlugin {
             PhysicsDiagnosticsPlugin,
             PhysicsDiagnosticsUiPlugin,
             FrameTimeDiagnosticsPlugin::default(),
-            // EguiPlugin::default(),
+            EguiPlugin::default(),
             // FilterQueryInspectorPlugin::<With<TypeToInspect>>::default(),
-            // WorldInspectorPlugin::new(),
+            WorldInspectorPlugin::new(),
         ));
 
         app.insert_resource(PhysicsDiagnosticsUiSettings {
